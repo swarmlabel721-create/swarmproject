@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CREW — CREATURE WORKS</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Noto+Sans+JP:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --black: #060606; --neon: #39ff14; --pink: #ff2d78; --red: #ff3b3b;
+  --white: #efefef; --border: rgba(255,255,255,0.07); --grid: rgba(255,255,255,0.032);
+}
+html, body { background: var(--black); color: var(--white); font-family: 'Noto Sans JP', sans-serif; min-height: 100vh; }
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background-image: linear-gradient(var(--grid) 1px,transparent 1px), linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size: 48px 48px; pointer-events: none; z-index: 0;
+}
+body::after {
+  content: ''; position: fixed; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px);
+  pointer-events: none; z-index: 999;
+}
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: stretch;
+  background: rgba(6,6,6,0.97); border-bottom: 1px solid var(--border);
+}
+.nav-logo { padding: 11px 22px; border-right: 1px solid var(--border); font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; letter-spacing: 0.14em; line-height: 1.15; color: var(--white); text-decoration: none; display: flex; align-items: center; }
+.nav-logo em { color: var(--neon); font-style: normal; }
+.nav-links { display: flex; flex: 1; justify-content: center; list-style: none; }
+.nav-links a { font-family: 'Bebas Neue', sans-serif; font-size: 0.82rem; letter-spacing: 0.28em; color: rgba(239,239,239,0.5); text-decoration: none; padding: 0 24px; display: flex; align-items: center; height: 100%; transition: color 0.2s; }
+.nav-links a:hover { color: var(--white); }
+.nav-links a.active { color: var(--white); border-bottom: 2px solid var(--neon); }
+.nav-status { display: flex; align-items: center; padding: 0 18px; gap: 10px; border-left: 1px solid var(--border); font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: rgba(239,239,239,0.4); }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--neon); box-shadow: 0 0 6px var(--neon); animation: pulse 2s ease infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.ticker-wrap { width: 100%; overflow: hidden; background: var(--neon); padding: 6px 0; position: relative; z-index: 10; margin-top: 48px; }
+.ticker { display: flex; white-space: nowrap; animation: ticker 24s linear infinite; }
+.ticker span { font-family: 'Bebas Neue', sans-serif; font-size: 0.78rem; letter-spacing: 0.22em; color: var(--black); padding: 0 24px; }
+@keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+.page-header { position: relative; z-index: 1; padding: 40px 60px 36px; border-bottom: 1px solid var(--border); }
+.page-eyebrow { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; letter-spacing: 0.45em; color: var(--neon); display: block; margin-bottom: 8px; }
+.page-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 6vw, 5.5rem); letter-spacing: 0.06em; line-height: 0.9; }
+.page-sub { font-family: 'Share Tech Mono', monospace; font-size: 0.56rem; letter-spacing: 0.12em; color: rgba(239,239,239,0.3); margin-top: 10px; line-height: 1.8; }
+
+/* CREW GRID */
+.crew-section { position: relative; z-index: 1; padding: 60px; max-width: 1200px; margin: 0 auto; }
+.crew-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); }
+
+/* PROFILE CARD */
+.profile-card { background: var(--black); display: flex; flex-direction: column; transition: background 0.2s; }
+.profile-card:hover { background: #0c0c0c; }
+
+.profile-img { position: relative; overflow: hidden; }
+.profile-img img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; filter: grayscale(30%) brightness(0.72) contrast(1.1); transition: filter 0.4s; }
+.profile-card:hover .profile-img img { filter: grayscale(0%) brightness(0.88) contrast(1.05); }
+
+/* ケースファイルオーバーレイ */
+.case-overlay {
+  position: absolute; top: 0; left: 0; right: 0;
+  padding: 12px 14px;
+  background: linear-gradient(to bottom, rgba(6,6,6,0.75) 0%, transparent 100%);
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.case-file-num { font-family: 'Share Tech Mono', monospace; font-size: 0.52rem; letter-spacing: 0.12em; color: rgba(239,239,239,0.5); }
+.case-status { font-family: 'Share Tech Mono', monospace; font-size: 0.5rem; letter-spacing: 0.1em; padding: 2px 6px; border: 1px solid rgba(57,255,20,0.4); color: var(--neon); }
+
+/* プロファイルデータ */
+.profile-data { padding: 20px 20px 24px; display: flex; flex-direction: column; gap: 14px; border-top: 1px solid var(--border); }
+.profile-alias { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 0.06em; line-height: 1; }
+.profile-role { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; letter-spacing: 0.15em; color: var(--pink); }
+
+.profile-table { display: flex; flex-direction: column; gap: 8px; }
+.profile-row { display: flex; flex-direction: column; gap: 2px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.profile-row:last-child { border-bottom: none; padding-bottom: 0; }
+.profile-key { font-family: 'Share Tech Mono', monospace; font-size: 0.5rem; letter-spacing: 0.2em; color: rgba(239,239,239,0.28); }
+.profile-val { font-size: 0.75rem; line-height: 1.6; color: rgba(239,239,239,0.6); font-weight: 300; }
+
+/* REDACTED カード（空きスロット） */
+.profile-card.redacted { opacity: 0.4; }
+.redacted-img { aspect-ratio: 3/4; background: repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 8px); display: flex; align-items: center; justify-content: center; }
+.redacted-text { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 0.3em; color: rgba(239,239,239,0.2); }
+
+.hud-fixed { position: fixed; bottom: 18px; left: 18px; z-index: 50; font-family: 'Share Tech Mono', monospace; font-size: 0.52rem; color: rgba(255,255,255,0.22); line-height: 1.8; pointer-events: none; }
+.divider { height: 1px; background: var(--border); position: relative; z-index: 1; }
+footer { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; padding: 22px 60px; border-top: 1px solid var(--border); }
+.footer-links { display: flex; gap: 36px; }
+.footer-links a { font-family: 'Bebas Neue', sans-serif; font-size: 0.72rem; letter-spacing: 0.28em; color: rgba(239,239,239,0.25); text-decoration: none; transition: color 0.2s; }
+.footer-links a:hover { color: var(--neon); }
+.footer-sys { font-family: 'Share Tech Mono', monospace; font-size: 0.52rem; color: rgba(239,239,239,0.18); text-align: right; line-height: 1.8; }
+
+@media (max-width: 768px) {
+  .page-header { padding: 100px 20px 28px; }
+  .crew-section { padding: 32px 20px; }
+  .crew-grid { grid-template-columns: 1fr 1fr; }
+  .nav-status { display: none; }
+  footer { flex-direction: column; gap: 14px; padding: 20px; }
+  .footer-links { gap: 18px; flex-wrap: wrap; justify-content: center; }
+}
+@media (max-width: 480px) {
+  .crew-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="hud-fixed">X -26.2041<br>Y 127.6791<br>──────────<br>CREW / DOSSIER</div>
+
+<nav>
+  <a class="nav-logo" href="index.html">CREATURE<em>.</em>WORKS</a>
+  <ul class="nav-links">
+    <li><a href="archive.html">ARCHIVE</a></li>
+    <li><a href="fieldnotes.html">FIELD NOTES</a></li>
+    <li><a href="#">SIGNALS</a></li>
+    <li><a href="crew.html" class="active">CREW</a></li>
+  </ul>
+  <div class="nav-status"><div class="status-dot"></div>SYSTEM ACTIVE</div>
+</nav>
+
+<div class="ticker-wrap">
+  <div class="ticker">
+    <span>SUBJECT IDENTIFIED ✦</span><span>DOSSIER UPDATED ✦</span><span>OPERATOR ACTIVE ✦</span>
+    <span>PATTERN ANALYSIS ONGOING ✦</span><span>LOCATION TRACKED ✦</span><span>OKINAWA BASED ✦</span>
+    <span>SUBJECT IDENTIFIED ✦</span><span>DOSSIER UPDATED ✦</span><span>OPERATOR ACTIVE ✦</span>
+    <span>PATTERN ANALYSIS ONGOING ✦</span><span>LOCATION TRACKED ✦</span><span>OKINAWA BASED ✦</span>
+  </div>
+</div>
+
+<div class="page-header">
+  <span class="page-eyebrow">OPERATOR DOSSIER / RELATED SUBJECTS</span>
+  <h1 class="page-title">CREW</h1>
+  <p class="page-sub">
+    CREATURE WORKSに関与する発生源の記録。<br>
+    各個体の供給者および関係者プロファイル。観察継続中。
+  </p>
+</div>
+
+<div class="crew-section">
+  <div class="crew-grid">
+
+    <!-- MEMBER 01 -->
+    <div class="profile-card">
+      <div class="profile-img">
+        <img src="figure.jpg" alt="OPERATOR 01">
+        <div class="case-overlay">
+          <span class="case-file-num">CASE FILE: NO.001</span>
+          <span class="case-status">ACTIVE</span>
+        </div>
+      </div>
+      <div class="profile-data">
+        <div>
+          <div class="profile-alias">THE BUILDER</div>
+          <div class="profile-role">3D FABRICATOR / CREATURE SUPPLIER</div>
+        </div>
+        <div class="profile-table">
+          <div class="profile-row">
+            <span class="profile-key">KNOWN PATTERN</span>
+            <span class="profile-val">蛍光色、反復する有機的フォルム、意味不明な記号の混在</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-key">OBSERVED AREA</span>
+            <span class="profile-val">OKINAWA / JP — 行動範囲は局所的</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-key">BEHAVIOR</span>
+            <span class="profile-val">深夜の反復的造形行動。完成まで外部との接触を断つ傾向</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-key">STATUS</span>
+            <span class="profile-val" style="color: var(--neon);">▸ ACTIVE — 現在も個体を発生中</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEMBER 02 -->
+    <div class="profile-card">
+      <div class="profile-img">
+        <img src="figure2.jpg" alt="OPERATOR 02" style="filter:grayscale(50%) brightness(0.65) contrast(1.15);">
+        <div class="case-overlay">
+          <span class="case-file-num">CASE FILE: NO.002</span>
+          <span class="case-status">ACTIVE</span>
+        </div>
+      </div>
+      <div class="profile-data">
+        <div>
+          <div class="profile-alias">THE CARVER</div>
+          <div class="profile-role">TATTOO ARTIST / SKIN OPERATOR</div>
+        </div>
+        <div class="profile-table">
+          <div class="profile-row">
+            <span class="profile-key">KNOWN PATTERN</span>
+            <span class="profile-val">皮膚への永続的な痕跡記録。線の反復と密度による意味の構築</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-key">OBSERVED AREA</span>
+            <span class="profile-val">OKINAWA / JP — 対象者の身体に直接アクセス</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-key">BEHAVIOR</span>
+            <span class="profile-val">施術中は極度の集中状態。終了後に急激な弛緩が観察される</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-key">STATUS</span>
+            <span class="profile-val" style="color: var(--neon);">▸ ACTIVE — 痕跡の供給継続中</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEMBER 03 -->
+    <div class="profile-card">
+      <div class="profile-img">
+        <img src="figure.jpg" alt="OPERATOR 03" style="filter:grayscale(70%) brightness(0.55) contrast(1.2) hue-rotate(180deg);">
+        <div class="case-overlay">
+          <span class="case-file-num">CASE FILE: NO.003</span>
+          <span class="case-status">ACTIVE</span>
+        </div>
+      </div>
+      <div class="profile-data">
+        <div>
+          <div class="profile-alias">THE PIERCER</div>
+          <div class="profile-role">BODY PIERCING / PHYSICAL MODIFIER</div>
+        </div>
+        <div class="profile-table">
+          <div class="profile-row">
+            <span class="profile-key">KNOWN PATTERN</span>
+            <span class="profile-val">身体への異物挿入による恒久的改変。精密な位置選定の傾向</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-key">OBSERVED AREA</span>
+            <span class="profile-val">OKINAWA / JP — 施術室内での行動が中心</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-key">BEHAVIOR</span>
+            <span class="profile-val">施術前の長時間にわたる対象者との対話が確認されている</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-key">STATUS</span>
+            <span class="profile-val" style="color: var(--neon);">▸ ACTIVE — 改変行為継続中</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REDACTED SLOT -->
+    <div class="profile-card redacted">
+      <div class="redacted-img">
+        <span class="redacted-text">[ REDACTED ]</span>
+      </div>
+      <div class="profile-data">
+        <div>
+          <div class="profile-alias" style="color:rgba(239,239,239,0.2);">UNKNOWN</div>
+          <div class="profile-role" style="color:rgba(239,239,239,0.15);">IDENTITY UNCONFIRMED</div>
+        </div>
+        <div class="profile-table">
+          <div class="profile-row">
+            <span class="profile-key">STATUS</span>
+            <span class="profile-val" style="color: rgba(239,239,239,0.2);">// UNDER INVESTIGATION</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="divider"></div>
+<footer>
+  <div class="footer-links">
+    <a href="index.html">HOME</a>
+    <a href="archive.html">ARCHIVE</a>
+    <a href="fieldnotes.html">FIELD NOTES</a>
+    <a href="crew.html">CREW</a>
+    <a href="#">CONNECT</a>
+  </div>
+  <div class="footer-sys">CREATURE WORKS / OPERATOR DOSSIER<br>ALL SUBJECTS UNDER OBSERVATION</div>
+</footer>
+
+</body>
+</html>

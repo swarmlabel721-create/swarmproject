@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIELD NOTES — CREATURE WORKS</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Noto+Sans+JP:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --black: #060606; --neon: #39ff14; --pink: #ff2d78; --red: #ff3b3b;
+  --white: #efefef; --border: rgba(255,255,255,0.07); --grid: rgba(255,255,255,0.032);
+}
+html, body { background: var(--black); color: var(--white); font-family: 'Noto Sans JP', sans-serif; min-height: 100vh; }
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background-image: linear-gradient(var(--grid) 1px,transparent 1px), linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size: 48px 48px; pointer-events: none; z-index: 0;
+}
+body::after {
+  content: ''; position: fixed; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px);
+  pointer-events: none; z-index: 999;
+}
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: stretch;
+  background: rgba(6,6,6,0.97); border-bottom: 1px solid var(--border);
+}
+.nav-logo { padding: 11px 22px; border-right: 1px solid var(--border); font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; letter-spacing: 0.14em; line-height: 1.15; color: var(--white); text-decoration: none; display: flex; align-items: center; }
+.nav-logo em { color: var(--neon); font-style: normal; }
+.nav-links { display: flex; flex: 1; justify-content: center; list-style: none; }
+.nav-links a { font-family: 'Bebas Neue', sans-serif; font-size: 0.82rem; letter-spacing: 0.28em; color: rgba(239,239,239,0.5); text-decoration: none; padding: 0 24px; display: flex; align-items: center; height: 100%; transition: color 0.2s; }
+.nav-links a:hover { color: var(--white); }
+.nav-links a.active { color: var(--white); border-bottom: 2px solid var(--neon); }
+.nav-status { display: flex; align-items: center; padding: 0 18px; gap: 10px; border-left: 1px solid var(--border); font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: rgba(239,239,239,0.4); }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--neon); box-shadow: 0 0 6px var(--neon); animation: pulse 2s ease infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.ticker-wrap { width: 100%; overflow: hidden; background: var(--neon); padding: 6px 0; position: relative; z-index: 10; margin-top: 48px; }
+.ticker { display: flex; white-space: nowrap; animation: ticker 24s linear infinite; }
+.ticker span { font-family: 'Bebas Neue', sans-serif; font-size: 0.78rem; letter-spacing: 0.22em; color: var(--black); padding: 0 24px; }
+@keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+.page-header { position: relative; z-index: 1; padding: 40px 60px 36px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-end; justify-content: space-between; }
+.page-eyebrow { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; letter-spacing: 0.45em; color: var(--neon); display: block; margin-bottom: 8px; }
+.page-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 6vw, 5.5rem); letter-spacing: 0.06em; line-height: 0.9; }
+.page-sub { font-family: 'Share Tech Mono', monospace; font-size: 0.56rem; letter-spacing: 0.12em; color: rgba(239,239,239,0.3); margin-top: 10px; line-height: 1.8; }
+.log-count { font-family: 'Share Tech Mono', monospace; font-size: 0.56rem; letter-spacing: 0.12em; color: rgba(239,239,239,0.28); text-align: right; line-height: 2; }
+
+.notes-layout { position: relative; z-index: 1; display: flex; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
+
+.sidebar { width: 190px; flex-shrink: 0; padding: 36px 24px 36px 60px; border-right: 1px solid var(--border); }
+.filter-label { font-family: 'Bebas Neue', sans-serif; font-size: 0.6rem; letter-spacing: 0.45em; color: rgba(239,239,239,0.28); margin-bottom: 14px; }
+.filter-list { list-style: none; display: flex; flex-direction: column; gap: 1px; margin-bottom: 28px; }
+.filter-list a { font-family: 'Bebas Neue', sans-serif; font-size: 0.78rem; letter-spacing: 0.2em; color: rgba(239,239,239,0.4); text-decoration: none; padding: 6px 0 6px 10px; display: block; transition: color 0.2s; border-left: 2px solid transparent; }
+.filter-list a:hover { color: var(--white); }
+.filter-list a.active { color: var(--neon); border-left-color: var(--neon); }
+.sidebar-div { height: 1px; background: var(--border); margin: 20px 0; }
+.recent-label { font-family: 'Bebas Neue', sans-serif; font-size: 0.6rem; letter-spacing: 0.4em; color: rgba(239,239,239,0.28); margin-bottom: 14px; }
+.recent-item { display: flex; flex-direction: column; gap: 3px; margin-bottom: 14px; text-decoration: none; color: inherit; }
+.recent-date { font-family: 'Share Tech Mono', monospace; font-size: 0.52rem; letter-spacing: 0.1em; color: var(--pink); }
+.recent-title { font-size: 0.68rem; line-height: 1.5; color: rgba(239,239,239,0.45); transition: color 0.2s; }
+.recent-item:hover .recent-title { color: var(--white); }
+
+.log-list { flex: 1; display: flex; flex-direction: column; gap: 1px; background: var(--border); }
+
+/* FEATURED LOG */
+.log-featured { background: var(--black); display: grid; grid-template-columns: 1fr 1fr; min-height: 340px; text-decoration: none; color: inherit; transition: background 0.2s; cursor: pointer; }
+.log-featured:hover { background: #0c0c0c; }
+.log-img { position: relative; overflow: hidden; }
+.log-img img { width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(0.72) contrast(1.08); transition: transform 0.5s, filter 0.3s; }
+.log-featured:hover .log-img img { transform: scale(1.03); filter: brightness(0.85); }
+.log-type-tag {
+  position: absolute; top: 14px; left: 14px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 0.6rem; letter-spacing: 0.2em;
+  padding: 3px 10px; background: var(--pink); color: var(--white);
+}
+.log-body { padding: 36px 32px; display: flex; flex-direction: column; justify-content: space-between; border-left: 1px solid var(--border); }
+.log-meta { display: flex; align-items: center; gap: 12px; }
+.log-date { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; letter-spacing: 0.12em; color: var(--pink); }
+.log-cat { font-family: 'Bebas Neue', sans-serif; font-size: 0.58rem; letter-spacing: 0.15em; padding: 1px 7px; border: 1px solid rgba(57,255,20,0.35); color: var(--neon); }
+.log-title-lg { font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.5rem, 2.2vw, 2rem); letter-spacing: 0.05em; line-height: 1.05; margin: 14px 0 10px; }
+.log-excerpt { font-size: 0.78rem; line-height: 1.82; color: rgba(239,239,239,0.48); font-weight: 300; }
+.log-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; }
+.btn-read { font-family: 'Bebas Neue', sans-serif; font-size: 0.75rem; letter-spacing: 0.22em; color: var(--white); padding: 8px 22px; border: 1px solid rgba(239,239,239,0.3); text-decoration: none; transition: all 0.2s; }
+.btn-read:hover { background: var(--white); color: var(--black); }
+.log-readtime { font-family: 'Share Tech Mono', monospace; font-size: 0.52rem; letter-spacing: 0.1em; color: rgba(239,239,239,0.22); }
+
+/* NORMAL LOG CARD */
+.log-card { background: var(--black); display: grid; grid-template-columns: 260px 1fr; min-height: 190px; text-decoration: none; color: inherit; transition: background 0.2s; cursor: pointer; }
+.log-card:hover { background: #0c0c0c; }
+.log-card .log-img img { filter: brightness(0.68) contrast(1.1); }
+.log-card:hover .log-img img { filter: brightness(0.82); }
+.log-card-body { padding: 24px 28px; display: flex; flex-direction: column; justify-content: space-between; border-left: 1px solid var(--border); }
+.log-title-sm { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.05em; line-height: 1.05; margin: 8px 0 6px; }
+.log-excerpt-sm { font-size: 0.74rem; line-height: 1.78; color: rgba(239,239,239,0.45); font-weight: 300; }
+.log-more { font-family: 'Bebas Neue', sans-serif; font-size: 0.62rem; letter-spacing: 0.18em; color: rgba(239,239,239,0.22); margin-top: 12px; transition: color 0.2s; }
+.log-card:hover .log-more { color: var(--neon); }
+
+.hud-fixed { position: fixed; bottom: 18px; left: 18px; z-index: 50; font-family: 'Share Tech Mono', monospace; font-size: 0.52rem; color: rgba(255,255,255,0.22); line-height: 1.8; pointer-events: none; }
+.divider { height: 1px; background: var(--border); position: relative; z-index: 1; }
+footer { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; padding: 22px 60px; border-top: 1px solid var(--border); }
+.footer-links { display: flex; gap: 36px; }
+.footer-links a { font-family: 'Bebas Neue', sans-serif; font-size: 0.72rem; letter-spacing: 0.28em; color: rgba(239,239,239,0.25); text-decoration: none; transition: color 0.2s; }
+.footer-links a:hover { color: var(--neon); }
+.footer-sys { font-family: 'Share Tech Mono', monospace; font-size: 0.52rem; color: rgba(239,239,239,0.18); text-align: right; line-height: 1.8; }
+
+@media (max-width: 768px) {
+  .page-header { padding: 100px 20px 28px; flex-direction: column; gap: 8px; }
+  .sidebar { display: none; }
+  .log-featured { grid-template-columns: 1fr; }
+  .log-body { padding: 20px; border-left: none; border-top: 1px solid var(--border); }
+  .log-card { grid-template-columns: 1fr; }
+  .log-card-body { padding: 18px; border-left: none; border-top: 1px solid var(--border); }
+  .log-img { height: 220px; }
+  .nav-status { display: none; }
+  footer { flex-direction: column; gap: 14px; padding: 20px; }
+  .footer-links { gap: 18px; flex-wrap: wrap; justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="hud-fixed">X -26.2041<br>Y 127.6791<br>──────────<br>FIELD NOTES / LOG</div>
+
+<nav>
+  <a class="nav-logo" href="index.html">CREATURE<em>.</em>WORKS</a>
+  <ul class="nav-links">
+    <li><a href="archive.html">ARCHIVE</a></li>
+    <li><a href="fieldnotes.html" class="active">FIELD NOTES</a></li>
+    <li><a href="#">SIGNALS</a></li>
+    <li><a href="crew.html">CREW</a></li>
+  </ul>
+  <div class="nav-status"><div class="status-dot"></div>SYSTEM ACTIVE</div>
+</nav>
+
+<div class="ticker-wrap">
+  <div class="ticker">
+    <span>CASE LOG UPDATED ✦</span><span>BEHAVIOR PATTERN RECORDED ✦</span><span>NEW EVIDENCE FILED ✦</span>
+    <span>FIELD REPORT INCOMING ✦</span><span>OBSERVATION LOGGED ✦</span><span>SUBJECT ACTIVE ✦</span>
+    <span>CASE LOG UPDATED ✦</span><span>BEHAVIOR PATTERN RECORDED ✦</span><span>NEW EVIDENCE FILED ✦</span>
+    <span>FIELD REPORT INCOMING ✦</span><span>OBSERVATION LOGGED ✦</span><span>SUBJECT ACTIVE ✦</span>
+  </div>
+</div>
+
+<div class="page-header">
+  <div>
+    <span class="page-eyebrow">CASE LOG / FIELD DOCUMENTATION</span>
+    <h1 class="page-title">FIELD NOTES</h1>
+    <p class="page-sub">
+      発生記録、行動観察、証拠品の調査報告。<br>
+      全記録は関係者による一次資料である。
+    </p>
+  </div>
+  <div class="log-count">
+    TOTAL RECORDS<br>
+    <span style="font-size:1.4rem; color: var(--white); letter-spacing:0.1em;">05</span><br>
+    CASE LOG: 03 / EVIDENCE: 02
+  </div>
+</div>
+
+<div class="notes-layout">
+  <aside class="sidebar">
+    <p class="filter-label">CATEGORY</p>
+    <ul class="filter-list">
+      <li><a href="#" class="active">ALL RECORDS</a></li>
+      <li><a href="#">CASE LOG</a></li>
+      <li><a href="#">EVIDENCE</a></li>
+      <li><a href="#">BEHAVIOR LOG</a></li>
+      <li><a href="#">SIGHTING REPORT</a></li>
+      <li><a href="#">CREATOR DOSSIER</a></li>
+    </ul>
+    <div class="sidebar-div"></div>
+    <p class="recent-label">RECENT LOGS</p>
+    <a class="recent-item" href="#">
+      <span class="recent-date">2026.06.26</span>
+      <span class="recent-title">Vol.1 — 犯行の記録、全工程を公開</span>
+    </a>
+    <a class="recent-item" href="#">
+      <span class="recent-date">2026.06.18</span>
+      <span class="recent-title">グラフィティを立体に封じ込める試み</span>
+    </a>
+    <a class="recent-item" href="#">
+      <span class="recent-date">2026.06.10</span>
+      <span class="recent-title">このシステムの起動について</span>
+    </a>
+  </aside>
+
+  <main class="log-list">
+
+    <!-- FEATURED -->
+    <a class="log-featured" href="#">
+      <div class="log-img">
+        <img src="figure.jpg" alt="">
+        <span class="log-type-tag">CASE LOG</span>
+      </div>
+      <div class="log-body">
+        <div>
+          <div class="log-meta">
+            <span class="log-date">2026.06.26</span>
+            <span class="log-cat">BEHAVIOR LOG</span>
+          </div>
+          <h2 class="log-title-lg">記録番号 CW-026。<br>制作工程の全記録を公開する。</h2>
+          <p class="log-excerpt">
+            第一個体の発生に際し、制作者は72時間以上にわたる反復的な塗装行動を行った。
+            グラフィティ様の筆跡は意図的なものであり、制作者の内的衝動を外部化した痕跡と見られる。
+            本記録はその全工程を時系列で保管するものである。
+          </p>
+        </div>
+        <div class="log-footer">
+          <a href="#" class="btn-read">READ FULL REPORT</a>
+          <span class="log-readtime">READ 5 MIN</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- LOG 2 -->
+    <a class="log-card" href="#">
+      <div class="log-img"><img src="figure2.jpg" alt=""></div>
+      <div class="log-card-body">
+        <div>
+          <div class="log-meta"><span class="log-date">2026.06.18</span><span class="log-cat">EVIDENCE</span></div>
+          <h2 class="log-title-sm">平面から立体へ — グラフィティを三次元に封じ込める試み</h2>
+          <p class="log-excerpt-sm">壁面への痕跡記録として発達したグラフィティ行動が、三次元の個体表面へと転換される過程の観察記録。制作者の行動変容について分析する。</p>
+        </div>
+        <span class="log-more">READ REPORT →</span>
+      </div>
+    </a>
+
+    <!-- LOG 3 -->
+    <a class="log-card" href="#">
+      <div class="log-img"><img src="figure.jpg" alt="" style="filter:brightness(0.6) hue-rotate(200deg) saturate(1.2) contrast(1.1);"></div>
+      <div class="log-card-body">
+        <div>
+          <div class="log-meta"><span class="log-date">2026.06.14</span><span class="log-cat">BEHAVIOR LOG</span></div>
+          <h2 class="log-title-sm">発生装置の選定記録 — 使用機材と素材に関する調査報告</h2>
+          <p class="log-excerpt-sm">個体の発生に使用された造形装置および塗料の種別を記録する。FDM方式とSLA方式の選定根拠、並びに後処理における化学的処置について。</p>
+        </div>
+        <span class="log-more">READ REPORT →</span>
+      </div>
+    </a>
+
+    <!-- LOG 4 -->
+    <a class="log-card" href="#">
+      <div class="log-img"><img src="figure2.jpg" alt="" style="filter:brightness(0.6) hue-rotate(300deg) saturate(1.4) contrast(1.1);"></div>
+      <div class="log-card-body">
+        <div>
+          <div class="log-meta"><span class="log-date">2026.06.10</span><span class="log-cat">SIGHTING REPORT</span></div>
+          <h2 class="log-title-sm">目撃情報 — 関係者集合の記録、日時・場所・状況</h2>
+          <p class="log-excerpt-sm">複数の関係者が同一空間に集合することが確認された。発生した個体の展示、および新たな発生予告が行われた模様。詳細は追って送信。</p>
+        </div>
+        <span class="log-more">READ REPORT →</span>
+      </div>
+    </a>
+
+    <!-- LOG 5 -->
+    <a class="log-card" href="#">
+      <div class="log-img"><img src="figure.jpg" alt="" style="filter:grayscale(0.5) brightness(0.58) contrast(1.12);"></div>
+      <div class="log-card-body">
+        <div>
+          <div class="log-meta"><span class="log-date">2026.06.10</span><span class="log-cat">CASE LOG</span></div>
+          <h2 class="log-title-sm">このシステムの起動について — CREATURE WORKSの発生記録</h2>
+          <p class="log-excerpt-sm">本観察システムが起動した経緯を記録する。発生源の特定、活動範囲の設定、および今後の観察方針について。</p>
+        </div>
+        <span class="log-more">READ REPORT →</span>
+      </div>
+    </a>
+
+  </main>
+</div>
+
+<div class="divider"></div>
+<footer>
+  <div class="footer-links">
+    <a href="index.html">HOME</a>
+    <a href="archive.html">ARCHIVE</a>
+    <a href="fieldnotes.html">FIELD NOTES</a>
+    <a href="crew.html">CREW</a>
+    <a href="#">CONNECT</a>
+  </div>
+  <div class="footer-sys">CREATURE WORKS / CASE LOG SYSTEM<br>ALL RECORDS ARE PRIMARY SOURCE DOCUMENTS</div>
+</footer>
+
+</body>
+</html>

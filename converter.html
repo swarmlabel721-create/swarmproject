@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CW — TEXT CONVERTER</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Noto+Sans+JP:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --black: #060606; --neon: #39ff14; --pink: #ff2d78; --red: #ff3b3b;
+  --white: #efefef; --border: rgba(255,255,255,0.07); --grid: rgba(255,255,255,0.032);
+}
+html, body {
+  background: var(--black); color: var(--white);
+  font-family: 'Noto Sans JP', sans-serif; min-height: 100vh;
+}
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background-image: linear-gradient(var(--grid) 1px,transparent 1px), linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size: 48px 48px; pointer-events: none; z-index: 0;
+}
+body::after {
+  content: ''; position: fixed; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px);
+  pointer-events: none; z-index: 999;
+}
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: stretch;
+  background: rgba(6,6,6,0.97); border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  padding: 11px 22px; border-right: 1px solid var(--border);
+  font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; letter-spacing: 0.14em; line-height: 1.15;
+  color: var(--white); text-decoration: none; display: flex; align-items: center;
+}
+.nav-logo em { color: var(--neon); font-style: normal; }
+.nav-title {
+  display: flex; align-items: center; padding: 0 24px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 0.82rem; letter-spacing: 0.3em;
+  color: rgba(239,239,239,0.4); flex: 1;
+}
+.nav-back {
+  display: flex; align-items: center; padding: 0 20px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 0.72rem; letter-spacing: 0.2em;
+  color: rgba(239,239,239,0.35); text-decoration: none;
+  border-left: 1px solid var(--border); transition: color 0.2s;
+}
+.nav-back:hover { color: var(--neon); }
+
+/* MAIN */
+.main {
+  position: relative; z-index: 1;
+  max-width: 960px; margin: 0 auto;
+  padding: 48px 40px 80px;
+}
+
+/* HEADER */
+.page-header { margin-bottom: 40px; }
+.page-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.45em; color: var(--neon);
+  margin-bottom: 10px; display: block;
+}
+.page-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.2rem, 5vw, 3.5rem); letter-spacing: 0.06em; line-height: 0.9;
+}
+.page-desc {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.12em;
+  color: rgba(239,239,239,0.35); line-height: 1.8; margin-top: 12px;
+}
+
+/* FORM */
+.convert-form { display: flex; flex-direction: column; gap: 24px; }
+
+/* METADATA ROW */
+.meta-row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px; background: var(--border);
+}
+.meta-field {
+  background: var(--black); padding: 16px 18px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.meta-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.6rem; letter-spacing: 0.4em; color: rgba(239,239,239,0.3);
+}
+.meta-input {
+  background: transparent; border: none; outline: none;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.78rem; letter-spacing: 0.1em; color: var(--white);
+  width: 100%;
+}
+.meta-input::placeholder { color: rgba(239,239,239,0.2); }
+.meta-select {
+  background: transparent; border: none; outline: none;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.78rem; letter-spacing: 0.1em; color: var(--white);
+  width: 100%; cursor: pointer;
+  -webkit-appearance: none;
+}
+.meta-select option { background: #111; color: var(--white); }
+
+/* INPUT AREA */
+.input-block, .output-block {
+  display: flex; flex-direction: column; gap: 0;
+  border: 1px solid var(--border);
+}
+.block-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+}
+.block-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.65rem; letter-spacing: 0.4em; color: rgba(239,239,239,0.4);
+}
+.block-hint {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.52rem; letter-spacing: 0.1em; color: rgba(239,239,239,0.2);
+}
+textarea {
+  background: transparent; border: none; outline: none; resize: none;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.85rem; line-height: 1.85; color: var(--white);
+  padding: 20px 18px; min-height: 180px; width: 100%;
+}
+textarea::placeholder { color: rgba(239,239,239,0.18); }
+
+/* OUTPUT */
+.output-block { border-color: rgba(57,255,20,0.15); }
+.output-block .block-header { border-bottom-color: rgba(57,255,20,0.12); }
+.output-block .block-label { color: var(--neon); }
+#output-text {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.78rem; line-height: 2; color: rgba(239,239,239,0.8);
+  padding: 20px 18px; min-height: 180px;
+  white-space: pre-wrap; word-break: break-word;
+}
+.output-placeholder {
+  color: rgba(239,239,239,0.18);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.1em;
+}
+
+/* EVIDENCE ID DISPLAY */
+.evidence-bar {
+  display: flex; align-items: center; gap: 16px;
+  padding: 10px 16px;
+  background: rgba(57,255,20,0.04);
+  border-top: 1px solid rgba(57,255,20,0.1);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.15em;
+  color: var(--neon);
+}
+.evidence-bar span { color: rgba(239,239,239,0.3); }
+
+/* BUTTONS */
+.btn-row { display: flex; gap: 10px; align-items: center; }
+.btn {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.82rem; letter-spacing: 0.25em;
+  padding: 11px 28px; border: none; cursor: pointer;
+  transition: all 0.2s; text-decoration: none;
+}
+.btn-convert { background: var(--neon); color: var(--black); flex: 1; }
+.btn-convert:hover { background: var(--white); }
+.btn-convert:disabled { background: rgba(57,255,20,0.3); color: rgba(0,0,0,0.5); cursor: not-allowed; }
+.btn-copy {
+  background: transparent; border: 1px solid var(--border); color: var(--white);
+}
+.btn-copy:hover { border-color: var(--neon); color: var(--neon); }
+.btn-clear {
+  background: transparent; border: 1px solid rgba(255,59,59,0.3); color: var(--red);
+  font-size: 0.72rem; padding: 11px 18px;
+}
+.btn-clear:hover { background: var(--red); color: var(--black); }
+
+/* STATUS */
+.status-bar {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem; letter-spacing: 0.15em;
+  color: rgba(239,239,239,0.3);
+}
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(239,239,239,0.2);
+}
+.status-dot.active { background: var(--neon); box-shadow: 0 0 6px var(--neon); animation: pulse 1s ease infinite; }
+.status-dot.error { background: var(--red); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* LOADING */
+.loading-dots::after {
+  content: '...';
+  animation: dots 1.2s steps(4, end) infinite;
+}
+@keyframes dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+
+/* DIVIDER */
+.section-divider {
+  height: 1px; background: var(--border); margin: 12px 0;
+}
+
+/* NOTION RULES BOX */
+.rules-box {
+  border: 1px solid var(--border); margin-top: 48px;
+}
+.rules-header {
+  padding: 12px 18px; border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.65rem; letter-spacing: 0.4em; color: rgba(239,239,239,0.4);
+}
+.rules-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1px; background: var(--border);
+}
+.rule-item { background: var(--black); padding: 14px 18px; }
+.rule-key {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem; letter-spacing: 0.15em; color: var(--neon); margin-bottom: 4px;
+}
+.rule-val { font-size: 0.75rem; color: rgba(239,239,239,0.55); line-height: 1.6; }
+
+@media (max-width: 640px) {
+  .main { padding: 32px 16px 60px; }
+  .meta-row { grid-template-columns: 1fr; }
+  .rules-grid { grid-template-columns: 1fr; }
+  .btn-row { flex-direction: column; }
+  .btn-convert { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">CREATURE<em>.</em>WORKS</a>
+  <div class="nav-title">TEXT CONVERTER — CASE LOG SYSTEM</div>
+  <a class="nav-back" href="index.html">← RETURN</a>
+</nav>
+
+<div class="main">
+
+  <div class="page-header">
+    <span class="page-eyebrow">INTERNAL TOOL / AUTHORIZED OPERATORS ONLY</span>
+    <h1 class="page-title">CASE LOG<br>CONVERTER</h1>
+    <p class="page-desc">
+      RAW TEXT → CASE DOCUMENTATION FORMAT<br>
+      通常の文章を捜査記録フォーマットに変換するシステム
+    </p>
+  </div>
+
+  <div class="convert-form">
+
+    <!-- META -->
+    <div class="meta-row">
+      <div class="meta-field">
+        <span class="meta-label">EVIDENCE ID</span>
+        <input class="meta-input" id="evidence-id" type="text" placeholder="CW-001" maxlength="10">
+      </div>
+      <div class="meta-field">
+        <span class="meta-label">CATEGORY</span>
+        <select class="meta-select" id="category">
+          <option value="CASE LOG">CASE LOG</option>
+          <option value="EVIDENCE">EVIDENCE</option>
+          <option value="BEHAVIOR LOG">BEHAVIOR LOG</option>
+          <option value="SIGHTING REPORT">SIGHTING REPORT</option>
+          <option value="INCIDENT REPORT">INCIDENT REPORT</option>
+          <option value="CREATOR DOSSIER">CREATOR DOSSIER</option>
+        </select>
+      </div>
+      <div class="meta-field">
+        <span class="meta-label">OPERATOR</span>
+        <input class="meta-input" id="operator" type="text" placeholder="HANDLER_01" maxlength="20">
+      </div>
+    </div>
+
+    <!-- RAW INPUT -->
+    <div class="input-block">
+      <div class="block-header">
+        <span class="block-label">RAW TEXT — 元の文章をここに入力</span>
+        <span class="block-hint">普通に書いてOK</span>
+      </div>
+      <textarea id="raw-input" placeholder="例：新しいフィギュアを作りました。緑色のボディにグラフィティを手描きしています。今回は特にペイントに時間がかかりました。"></textarea>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="btn-row">
+      <button class="btn btn-convert" id="convert-btn" onclick="convertText()">
+        ▸ CONVERT TO CASE LOG
+      </button>
+      <button class="btn btn-copy" onclick="copyOutput()">COPY</button>
+      <button class="btn btn-clear" onclick="clearAll()">CLEAR</button>
+    </div>
+
+    <!-- STATUS -->
+    <div class="status-bar">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text">STANDBY — 変換待機中</span>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="output-block">
+      <div class="block-header">
+        <span class="block-label">CONVERTED OUTPUT — 変換後の調査文</span>
+        <span class="block-hint" id="char-count">— CHARS</span>
+      </div>
+      <div id="output-text">
+        <span class="output-placeholder">// 変換結果がここに表示されます</span>
+      </div>
+      <div class="evidence-bar" id="evidence-bar" style="display:none;">
+        <span>EVIDENCE ID:</span> <strong id="ev-display">—</strong>
+        <span>|</span>
+        <span>CATEGORY:</span> <strong id="cat-display">—</strong>
+        <span>|</span>
+        <span>LOGGED BY:</span> <strong id="op-display">—</strong>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- NOTION RULES -->
+  <div class="rules-box">
+    <div class="rules-header">NOTION 投稿ルール — FIELD OPERATORS GUIDE</div>
+    <div class="rules-grid">
+      <div class="rule-item">
+        <div class="rule-key">TITLE</div>
+        <div class="rule-val">30文字以内。記録番号から始めると統一感が出る</div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-key">THUMBNAIL</div>
+        <div class="rule-val">必須。横長推奨（16:9）、作品単体は正方形OK</div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-key">CATEGORY</div>
+        <div class="rule-val">CASE LOG / EVIDENCE / BEHAVIOR LOG / SIGHTING / INCIDENT から必ず選ぶ</div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-key">STATUS</div>
+        <div class="rule-val">Draft → Review → Public の順で進める。Publicのみ表示される</div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-key">EVIDENCE ID</div>
+        <div class="rule-val">CW-001 形式で連番。被る場合は末尾にアルファベット追加</div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-key">IMAGE</div>
+        <div class="rule-val">スマホ撮影の場合は横向き推奨。縦長は切れる場合あり</div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-key">DATE</div>
+        <div class="rule-val">YYYY.MM.DD 形式で必ず入力。空欄不可</div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-key">RAW TEXT</div>
+        <div class="rule-val">普通に日本語で書いてOK。変換はAIが行う</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+async function convertText() {
+  const raw = document.getElementById('raw-input').value.trim();
+  if (!raw) { setStatus('error', 'INPUT EMPTY — テキストを入力してください'); return; }
+
+  const evidenceId = document.getElementById('evidence-id').value || 'CW-XXX';
+  const category = document.getElementById('category').value;
+  const operator = document.getElementById('operator').value || 'UNKNOWN';
+
+  const btn = document.getElementById('convert-btn');
+  btn.disabled = true;
+  btn.innerHTML = '▸ PROCESSING<span class="loading-dots"></span>';
+  setStatus('active', 'CONVERTING — 変換処理中');
+
+  const outputEl = document.getElementById('output-text');
+  outputEl.innerHTML = '<span class="output-placeholder">// 解析中...</span>';
+
+  const systemPrompt = `あなたはCREATURE WORKSという架空のアート活動体の「捜査記録システム」です。
+投稿された文章を、架空の捜査資料・調査記録の文体に変換します。
+
+変換ルール：
+- トーンは「冷静」「断定しすぎない」「観察が異常に細かい」「少しだけ不穏」
+- 作者の行動を「傾向」として分析する
+- 作品を「個体」「証拠品」「押収物」「異物」として扱う
+- 制作行為を「発生」「確認」「記録」などの言葉で表現する
+- グロさや直接的な暴力表現は絶対に入れない
+- 「怖い文章」ではなく「異常に真面目な調査文」にする
+- 記録番号を冒頭に入れる（例：記録番号 ${evidenceId}。）
+- 出力は変換後の文章のみ。説明や前置きは不要
+- 日本語で出力する
+- 適度な改行を入れて読みやすくする
+- カテゴリは ${category}`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: raw }]
+      })
+    });
+
+    const data = await response.json();
+    const result = data.content?.[0]?.text || '';
+
+    if (result) {
+      outputEl.textContent = result;
+      document.getElementById('char-count').textContent = result.length + ' CHARS';
+
+      // evidence bar
+      const bar = document.getElementById('evidence-bar');
+      bar.style.display = 'flex';
+      document.getElementById('ev-display').textContent = evidenceId;
+      document.getElementById('cat-display').textContent = category;
+      document.getElementById('op-display').textContent = operator;
+
+      setStatus('active', 'CONVERSION COMPLETE — 変換完了');
+    } else {
+      outputEl.innerHTML = '<span class="output-placeholder">// 変換に失敗しました。再試行してください</span>';
+      setStatus('error', 'ERROR — 変換失敗');
+    }
+  } catch(e) {
+    outputEl.innerHTML = '<span class="output-placeholder">// API接続エラー。ネットワークを確認してください</span>';
+    setStatus('error', 'CONNECTION ERROR');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '▸ CONVERT TO CASE LOG';
+}
+
+function copyOutput() {
+  const text = document.getElementById('output-text').textContent;
+  if (!text || text.includes('//')) return;
+  navigator.clipboard.writeText(text).then(() => {
+    setStatus('active', 'COPIED TO CLIPBOARD');
+    setTimeout(() => setStatus('', 'STANDBY — 変換待機中'), 2000);
+  });
+}
+
+function clearAll() {
+  document.getElementById('raw-input').value = '';
+  document.getElementById('output-text').innerHTML = '<span class="output-placeholder">// 変換結果がここに表示されます</span>';
+  document.getElementById('evidence-bar').style.display = 'none';
+  document.getElementById('char-count').textContent = '— CHARS';
+  setStatus('', 'STANDBY — 変換待機中');
+}
+
+function setStatus(type, msg) {
+  const dot = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+  dot.className = 'status-dot' + (type ? ' ' + type : '');
+  text.textContent = msg;
+}
+</script>
+
+</body>
+</html>

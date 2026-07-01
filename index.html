@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CREATURE WORKS — SYSTEM ACTIVE</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Noto+Sans+JP:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --black: #060606;
+  --neon: #39ff14;
+  --pink: #ff2d78;
+  --white: #efefef;
+  --dim: rgba(239,239,239,0.45);
+  --border: rgba(255,255,255,0.07);
+  --grid: rgba(255,255,255,0.032);
+  --red: #ff3b3b;
+}
+
+html, body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Noto Sans JP', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SCAN LINE OVERLAY ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 999;
+}
+
+/* ── GRID ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: stretch;
+  background: rgba(6,6,6,0.97);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  padding: 11px 22px;
+  border-right: 1px solid var(--border);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.15rem; letter-spacing: 0.14em; line-height: 1.15;
+  color: var(--white); text-decoration: none;
+  display: flex; align-items: center;
+}
+.nav-logo em { color: var(--neon); font-style: normal; }
+.nav-links { display: flex; flex: 1; justify-content: center; list-style: none; }
+.nav-links a {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.82rem; letter-spacing: 0.28em;
+  color: rgba(239,239,239,0.5); text-decoration: none;
+  padding: 0 24px; display: flex; align-items: center;
+  height: 100%; transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--white); }
+.nav-status {
+  display: flex; align-items: center;
+  padding: 0 18px; gap: 14px;
+  border-left: 1px solid var(--border);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem; letter-spacing: 0.12em;
+  color: rgba(239,239,239,0.4);
+}
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--neon);
+  box-shadow: 0 0 6px var(--neon);
+  animation: pulse 2s ease infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  width: 100%; height: 100vh;
+  overflow: hidden; background: #000;
+}
+
+.fig-bg {
+  position: absolute; inset: 0;
+  background: url('figure.jpg') center center / cover no-repeat;
+  filter: brightness(0.55) saturate(0.9) contrast(1.1);
+  z-index: 0;
+  transform: scale(1.04);
+}
+
+/* レッドチャンネルずれエフェクト */
+.fig-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: url('figure.jpg') center center / cover no-repeat;
+  filter: brightness(0.3) saturate(0) sepia(1) hue-rotate(300deg);
+  mix-blend-mode: screen;
+  transform: translateX(3px);
+  opacity: 0.15;
+}
+
+.fig-overlay {
+  position: absolute; inset: 0; z-index: 2;
+  background: linear-gradient(to bottom,
+    rgba(6,6,6,0.92) 0%,
+    rgba(6,6,6,0.3) 20%,
+    transparent 40%,
+    transparent 55%,
+    rgba(6,6,6,0.5) 78%,
+    rgba(6,6,6,0.97) 100%
+  );
+}
+
+/* ── EVIDENCE TAPE（左右の斜め線） ── */
+.tape-left, .tape-right {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 2px;
+  z-index: 3; pointer-events: none;
+}
+.tape-left { left: 52px; background: repeating-linear-gradient(to bottom, transparent 0px, transparent 6px, rgba(57,255,20,0.12) 6px, rgba(57,255,20,0.12) 12px); }
+.tape-right { right: 52px; background: repeating-linear-gradient(to bottom, transparent 0px, transparent 6px, rgba(57,255,20,0.12) 6px, rgba(57,255,20,0.12) 12px); }
+
+/* ── LIGHTNING ── */
+.lightning-svg {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  width: 100%; height: 55%; z-index: 3; pointer-events: none;
+}
+
+/* ── LOGO ── */
+.logo-img-wrap {
+  position: absolute; top: 46%; left: 50%;
+  transform: translate(-50%, -52%);
+  z-index: 15; width: clamp(420px, 78vw, 1000px);
+  pointer-events: none;
+}
+.logo-img-wrap img {
+  width: 100%; height: auto; display: block;
+  filter:
+    drop-shadow(0 0 28px rgba(255,255,255,0.15))
+    drop-shadow(0 0 60px rgba(255,255,255,0.06))
+    drop-shadow(0 8px 18px rgba(0,0,0,0.98));
+}
+
+/* ── HUD ── */
+.hud {
+  position: absolute; z-index: 10;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.56rem; color: rgba(255,255,255,0.32);
+  line-height: 2; pointer-events: none;
+  letter-spacing: 0.08em;
+}
+.hud-tl { top: 72px; left: 18px; }
+.hud-tr { top: 72px; right: 18px; text-align: right; }
+.hud-bl { bottom: 80px; left: 18px; }
+
+.hud-icon {
+  width: 28px; height: 28px;
+  border: 1px solid rgba(255,255,255,0.18);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; color: rgba(255,255,255,0.3);
+  margin-bottom: 8px;
+}
+
+/* ── CASE FILE TAG (右下) ── */
+.case-tag {
+  position: absolute; bottom: 64px; right: 16px;
+  z-index: 20; width: 116px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(6,6,6,0.92);
+  pointer-events: none;
+}
+.case-tag img { width: 100%; display: block; filter: grayscale(100%) brightness(0.6) contrast(1.2); }
+.case-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.48rem; letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.4); padding: 5px 7px; line-height: 1.6;
+}
+.case-label .case-id { color: var(--red); }
+
+/* ── HERO BOTTOM ── */
+.hero-bottom {
+  position: absolute; bottom: 44px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 20; display: flex; flex-direction: column;
+  align-items: center; gap: 18px;
+}
+.signal-line {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem; letter-spacing: 0.5em;
+  color: var(--neon);
+  text-shadow: 0 0 12px rgba(57,255,20,0.9), 0 0 40px rgba(57,255,20,0.3);
+}
+.cta-row { display: flex; gap: 10px; }
+.btn {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.78rem; letter-spacing: 0.25em;
+  padding: 9px 24px; text-decoration: none;
+  transition: all 0.2s; cursor: pointer; border: none;
+}
+.btn-primary { background: var(--neon); color: var(--black); }
+.btn-primary:hover { background: var(--white); box-shadow: 0 0 20px rgba(57,255,20,0.6); }
+.btn-ghost { background: transparent; border: 1px solid rgba(239,239,239,0.3); color: var(--white); }
+.btn-ghost:hover { border-color: var(--neon); color: var(--neon); }
+.btn-red { background: transparent; border: 1px solid rgba(255,59,59,0.4); color: var(--red); }
+.btn-red:hover { background: var(--red); color: var(--black); }
+
+/* ── TICKER ── */
+.ticker-wrap {
+  width: 100%; overflow: hidden;
+  background: var(--neon); padding: 6px 0;
+  position: relative; z-index: 10;
+}
+.ticker { display: flex; white-space: nowrap; animation: ticker 24s linear infinite; }
+.ticker span {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.78rem; letter-spacing: 0.22em;
+  color: var(--black); padding: 0 24px;
+}
+.ticker .sep { color: rgba(0,0,0,0.4); }
+
+/* ── SECTIONS ── */
+.section {
+  position: relative; z-index: 1;
+  padding: 64px 60px;
+  max-width: 1140px; margin: 0 auto;
+}
+
+.section-eyebrow {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.62rem; letter-spacing: 0.55em;
+  color: var(--neon); display: flex; align-items: center; gap: 14px;
+  margin-bottom: 28px;
+}
+.section-eyebrow::after { content: ''; flex: 1; height: 1px; background: rgba(57,255,20,0.18); }
+.section-eyebrow .case-num {
+  font-family: 'Share Tech Mono', monospace;
+  color: rgba(239,239,239,0.2); font-size: 0.55rem; margin-left: 8px;
+}
+
+/* ── SIGNALS（NEWS） ── */
+.signals-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--border);
+}
+.signal-card {
+  background: var(--black); padding: 22px 20px;
+  display: flex; flex-direction: column; gap: 8px;
+  cursor: pointer; transition: background 0.2s;
+  text-decoration: none; color: inherit;
+}
+.signal-card:hover { background: #0e0e0e; }
+.signal-meta { display: flex; align-items: center; gap: 10px; }
+.signal-date {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.12em; color: var(--pink);
+}
+.signal-type {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.58rem; letter-spacing: 0.15em;
+  padding: 1px 6px; border: 1px solid rgba(57,255,20,0.3); color: var(--neon);
+}
+.signal-title { font-size: 0.82rem; line-height: 1.65; font-weight: 400; }
+.signal-more {
+  margin-top: auto;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.65rem; letter-spacing: 0.15em;
+  color: rgba(239,239,239,0.2); transition: color 0.2s;
+}
+.signal-card:hover .signal-more { color: var(--neon); }
+
+/* ── ACTIVE CREATURES（PICKUP） ── */
+.creatures-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--border);
+}
+.creature-card {
+  background: var(--black);
+  cursor: pointer; transition: background 0.2s;
+  text-decoration: none; color: inherit;
+  display: flex; flex-direction: column;
+}
+.creature-card:hover { background: #0d0d0d; }
+.creature-img-wrap { overflow: hidden; position: relative; }
+.creature-img-wrap img {
+  width: 100%; aspect-ratio: 1/1; object-fit: cover;
+  display: block; filter: brightness(0.82) contrast(1.05);
+  transition: transform 0.5s, filter 0.3s;
+}
+.creature-card:hover .creature-img-wrap img {
+  transform: scale(1.05); filter: brightness(0.95);
+}
+.creature-specimen {
+  position: absolute; top: 10px; left: 10px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.52rem; letter-spacing: 0.1em;
+  padding: 2px 7px; background: rgba(6,6,6,0.85);
+  border: 1px solid rgba(57,255,20,0.4); color: var(--neon);
+}
+.creature-info {
+  padding: 14px 16px 18px;
+  border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.creature-id {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.54rem; letter-spacing: 0.15em; color: rgba(239,239,239,0.22);
+}
+.creature-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.05rem; letter-spacing: 0.06em; line-height: 1;
+}
+.creature-status {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem; letter-spacing: 0.1em; color: var(--neon);
+  margin-top: 2px;
+}
+.creature-status.captured { color: rgba(239,239,239,0.25); }
+
+/* ── FIELD NOTES PREVIEW（BLOG） ── */
+.notes-list {
+  display: flex; flex-direction: column;
+  gap: 1px; background: var(--border);
+}
+.note-card {
+  background: var(--black);
+  display: grid; grid-template-columns: 240px 1fr;
+  min-height: 160px;
+  cursor: pointer; transition: background 0.2s;
+  text-decoration: none; color: inherit;
+}
+.note-card:hover { background: #0d0d0d; }
+.note-img { overflow: hidden; }
+.note-img img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block; filter: brightness(0.75) contrast(1.1);
+  transition: filter 0.3s, transform 0.4s;
+}
+.note-card:hover .note-img img { filter: brightness(0.9); transform: scale(1.03); }
+.note-body {
+  padding: 22px 28px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  border-left: 1px solid var(--border);
+}
+.note-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.note-date {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem; letter-spacing: 0.12em; color: var(--pink);
+}
+.note-cat {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.58rem; letter-spacing: 0.15em;
+  padding: 1px 6px; border: 1px solid rgba(255,45,120,0.35); color: var(--pink);
+}
+.note-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem; letter-spacing: 0.05em; line-height: 1.05;
+}
+.note-excerpt {
+  font-size: 0.75rem; line-height: 1.7;
+  color: rgba(239,239,239,0.45); font-weight: 300; margin-top: 8px;
+}
+.note-more {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.65rem; letter-spacing: 0.18em;
+  color: rgba(239,239,239,0.22); margin-top: 14px; transition: color 0.2s;
+}
+.note-card:hover .note-more { color: var(--neon); }
+
+/* ── DIVIDER ── */
+.divider { height: 1px; background: var(--border); position: relative; z-index: 1; }
+
+/* ── FOOTER ── */
+footer {
+  position: relative; z-index: 1;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 22px 60px;
+  border-top: 1px solid var(--border);
+}
+.footer-links { display: flex; gap: 36px; }
+.footer-links a {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.72rem; letter-spacing: 0.28em;
+  color: rgba(239,239,239,0.25); text-decoration: none; transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--neon); }
+.footer-sys {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.52rem; letter-spacing: 0.1em;
+  color: rgba(239,239,239,0.18); text-align: right; line-height: 1.8;
+}
+
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+@media (max-width: 768px) {
+  nav { padding: 0; }
+  .nav-status { display: none; }
+  .nav-links { gap: 0; }
+  .nav-links a { padding: 0 14px; font-size: 0.72rem; }
+  .hud-tr, .hud-bl { display: none; }
+  .tape-left, .tape-right { display: none; }
+  .case-tag { display: none; }
+  .section { padding: 48px 20px; }
+  .signals-grid { grid-template-columns: 1fr; }
+  .creatures-grid { grid-template-columns: 1fr 1fr; }
+  .note-card { grid-template-columns: 1fr; }
+  .note-img img { height: 180px; }
+  .note-body { border-left: none; border-top: 1px solid var(--border); padding: 16px; }
+  footer { flex-direction: column; gap: 16px; padding: 20px; text-align: center; }
+  .footer-links { gap: 20px; flex-wrap: wrap; justify-content: center; }
+  .cta-row { flex-direction: column; align-items: center; }
+  .logo-img-wrap { width: 92vw; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="index.html">CREATURE<em>.</em>WORKS</a>
+  <ul class="nav-links">
+    <li><a href="archive.html">ARCHIVE</a></li>
+    <li><a href="fieldnotes.html">FIELD NOTES</a></li>
+    <li><a href="#">SIGNALS</a></li>
+    <li><a href="crew.html">CREW</a></li>
+  </ul>
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    SYSTEM ACTIVE
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="fig-bg"></div>
+  <div class="fig-overlay"></div>
+  <div class="tape-left"></div>
+  <div class="tape-right"></div>
+
+  <svg class="lightning-svg" viewBox="0 0 1440 400" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="gl"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <g filter="url(#gl)" opacity="0.45">
+      <polyline points="200,0 170,70 188,64 138,170 162,158 92,310 118,300 52,400" fill="none" stroke="#39ff14" stroke-width="1.2"/>
+      <polyline points="180,0 150,80 172,72 112,200 140,188 72,380" fill="none" stroke="#39ff14" stroke-width="0.7" opacity="0.5"/>
+    </g>
+    <g filter="url(#gl)" opacity="0.45">
+      <polyline points="1240,0 1270,70 1252,64 1302,170 1278,158 1348,310 1322,300 1388,400" fill="none" stroke="#39ff14" stroke-width="1.2"/>
+      <polyline points="1260,0 1290,80 1268,72 1328,200 1300,188 1368,380" fill="none" stroke="#39ff14" stroke-width="0.7" opacity="0.5"/>
+    </g>
+    <g opacity="0.18">
+      <path d="M60,400 Q160,362 240,378 Q320,392 400,368 Q480,344 540,362" fill="none" stroke="#39ff14" stroke-width="0.8"/>
+      <path d="M900,366 Q980,346 1060,364 Q1140,380 1220,356 Q1340,336 1410,374" fill="none" stroke="#39ff14" stroke-width="0.8"/>
+    </g>
+  </svg>
+
+  <!-- HUD -->
+  <div class="hud hud-tl">
+    <div class="hud-icon">⊞</div>
+    SYS_01<br>BOOT_OK<br>─────<br>⊕ GRID
+  </div>
+  <div class="hud hud-tr">
+    <div class="hud-icon" style="margin-left:auto;">⊕</div>
+    REC<br>─────<br>CAM_01
+  </div>
+  <div class="hud hud-bl">
+    X -26.2041<br>Y 127.6791<br>OKINAWA / JP
+  </div>
+
+  <!-- LOGO -->
+  <div class="logo-img-wrap">
+    <img src="logo_extracted.png" alt="CREATURE WORKS">
+  </div>
+
+  <!-- CASE FILE -->
+  <div class="case-tag">
+    <img src="figure2.jpg" alt="">
+    <div class="case-label">
+      <span class="case-id">CASE #CW-000</span><br>
+      SUBJECT ACTIVE<br>
+      LOCATION UNKNOWN
+    </div>
+  </div>
+
+  <!-- BOTTOM CTA -->
+  <div class="hero-bottom">
+    <div class="signal-line">▸ TRANSMISSION DETECTED</div>
+    <div class="cta-row">
+      <a href="archive.html" class="btn btn-primary">VIEW CREATURES</a>
+      <a href="fieldnotes.html" class="btn btn-ghost">FIELD NOTES</a>
+      <a href="#" class="btn btn-red">ACCESS SYSTEM</a>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    <span>NEW SPECIMEN DETECTED <span class="sep">✦</span></span>
+    <span>3D FABRICATED ORIGINAL CREATURES <span class="sep">✦</span></span>
+    <span>LIMITED PRODUCTION <span class="sep">✦</span></span>
+    <span>STREET × UNDERGROUND <span class="sep">✦</span></span>
+    <span>HANDCRAFTED IN OKINAWA <span class="sep">✦</span></span>
+    <span>EVIDENCE LOGGED <span class="sep">✦</span></span>
+    <span>NEW SPECIMEN DETECTED <span class="sep">✦</span></span>
+    <span>3D FABRICATED ORIGINAL CREATURES <span class="sep">✦</span></span>
+    <span>LIMITED PRODUCTION <span class="sep">✦</span></span>
+    <span>STREET × UNDERGROUND <span class="sep">✦</span></span>
+    <span>HANDCRAFTED IN OKINAWA <span class="sep">✦</span></span>
+    <span>EVIDENCE LOGGED <span class="sep">✦</span></span>
+  </div>
+</div>
+
+<!-- LATEST SIGNALS -->
+<div class="section">
+  <div class="section-eyebrow">
+    LATEST SIGNALS
+    <span class="case-num">// LOG_003</span>
+  </div>
+  <div class="signals-grid">
+    <a class="signal-card" href="#">
+      <div class="signal-meta">
+        <span class="signal-date">2026.06.26</span>
+        <span class="signal-type">SPECIMEN</span>
+      </div>
+      <div class="signal-title">新個体「GRAFFITI MONSTER Vol.1」の存在が確認された</div>
+      <div class="signal-more">OPEN FILE →</div>
+    </a>
+    <a class="signal-card" href="#">
+      <div class="signal-meta">
+        <span class="signal-date">2026.06.20</span>
+        <span class="signal-type">EVENT</span>
+      </div>
+      <div class="signal-title">接触報告 — ポップアップ展示の日程が決定、詳細は追って送信</div>
+      <div class="signal-more">OPEN FILE →</div>
+    </a>
+    <a class="signal-card" href="#">
+      <div class="signal-meta">
+        <span class="signal-date">2026.06.10</span>
+        <span class="signal-type">SYSTEM</span>
+      </div>
+      <div class="signal-title">このシステムが起動した。CREATURE WORKSは活動を開始する</div>
+      <div class="signal-more">OPEN FILE →</div>
+    </a>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ACTIVE CREATURES -->
+<div class="section">
+  <div class="section-eyebrow">
+    ACTIVE CREATURES
+    <span class="case-num">// ARCHIVE_LIVE</span>
+  </div>
+  <div class="creatures-grid">
+    <a class="creature-card" href="archive.html">
+      <div class="creature-img-wrap">
+        <img src="figure.jpg" alt="CW-001">
+        <span class="creature-specimen">SPECIMEN #001</span>
+      </div>
+      <div class="creature-info">
+        <span class="creature-id">CW-001 / 2026</span>
+        <span class="creature-name">GRAFFITI MONSTER Vol.1</span>
+        <span class="creature-status">▸ AVAILABLE — ¥28,000</span>
+      </div>
+    </a>
+    <a class="creature-card" href="archive.html">
+      <div class="creature-img-wrap">
+        <img src="figure2.jpg" alt="CW-002">
+        <span class="creature-specimen">SPECIMEN #002</span>
+      </div>
+      <div class="creature-info">
+        <span class="creature-id">CW-002 / 2026</span>
+        <span class="creature-name">GRAFFITI MONSTER Vol.2</span>
+        <span class="creature-status">▸ AVAILABLE — ¥32,000</span>
+      </div>
+    </a>
+    <a class="creature-card" href="archive.html">
+      <div class="creature-img-wrap">
+        <img src="figure.jpg" alt="CW-000" style="filter:grayscale(90%) brightness(0.5) contrast(1.2);">
+        <span class="creature-specimen">SPECIMEN #000</span>
+      </div>
+      <div class="creature-info">
+        <span class="creature-id">CW-000 / 2025</span>
+        <span class="creature-name">PROTOTYPE — ORIGIN</span>
+        <span class="creature-status captured">✕ CAPTURED — GONE</span>
+      </div>
+    </a>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- FIELD NOTES -->
+<div class="section">
+  <div class="section-eyebrow">
+    FIELD NOTES
+    <span class="case-num">// JOURNAL</span>
+  </div>
+  <div class="notes-list">
+    <a class="note-card" href="fieldnotes.html">
+      <div class="note-img">
+        <img src="figure.jpg" alt="">
+      </div>
+      <div class="note-body">
+        <div>
+          <div class="note-meta">
+            <span class="note-date">2026.06.26</span>
+            <span class="note-cat">MAKING</span>
+          </div>
+          <div class="note-title">Vol.1 — 犯行の記録。制作工程の全記録を公開する</div>
+          <p class="note-excerpt">3Dプリンターで成形されたボディに、グラフィティを施す。この行為がどのように行われたか、その痕跡をここに残す。</p>
+        </div>
+        <span class="note-more">READ REPORT →</span>
+      </div>
+    </a>
+    <a class="note-card" href="fieldnotes.html">
+      <div class="note-img">
+        <img src="figure2.jpg" alt="" style="filter:brightness(0.7) hue-rotate(200deg) saturate(1.2) contrast(1.1);">
+      </div>
+      <div class="note-body">
+        <div>
+          <div class="note-meta">
+            <span class="note-date">2026.06.18</span>
+            <span class="note-cat">GRAFFITI</span>
+          </div>
+          <div class="note-title">平面から立体へ — グラフィティを三次元に封じ込める試み</div>
+          <p class="note-excerpt">壁に描かれるはずだったものが、フィギュアの体に宿る。その変換がもたらす異質さについて。</p>
+        </div>
+        <span class="note-more">READ REPORT →</span>
+      </div>
+    </a>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<footer>
+  <div class="footer-links">
+    <a href="archive.html">ARCHIVE</a>
+    <a href="fieldnotes.html">FIELD NOTES</a>
+    <a href="#">SIGNALS</a>
+    <a href="crew.html">CREW</a>
+    <a href="#">CONNECT</a>
+  </div>
+  <div class="footer-sys">
+    CREATURE WORKS / SYSTEM v3.0<br>
+    ALL SPECIMENS HANDCRAFTED IN OKINAWA
+  </div>
+</footer>
+
+</body>
+</html>

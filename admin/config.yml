@@ -1,0 +1,55 @@
+backend:
+  name: github
+  repo: swarmlabel721-create/swarmproject
+  branch: main
+
+media_folder: "images"
+public_folder: "/images"
+
+locale: 'ja'
+
+collections:
+  - name: "fieldnotes"
+    label: "FIELD NOTES（捜査記録）"
+    folder: "_fieldnotes"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "タイトル", name: "title", widget: "string" }
+      - { label: "Evidence ID", name: "evidence_id", widget: "string", required: false }
+      - { label: "公開日", name: "date", widget: "datetime", format: "YYYY.MM.DD" }
+      - { label: "カテゴリ", name: "category", widget: "select", options: ["CASE LOG", "EVIDENCE", "BEHAVIOR LOG", "SIGHTING REPORT", "INCIDENT REPORT", "CREATOR DOSSIER"] }
+      - { label: "サムネイル画像", name: "thumbnail", widget: "image", required: false }
+      - { label: "投稿者", name: "author", widget: "string", required: false }
+      - { label: "抜粋", name: "excerpt", widget: "text", required: false }
+      - { label: "本文（元原稿）", name: "raw_text", widget: "text", required: false }
+      - { label: "本文（変換後）", name: "body", widget: "markdown" }
+      - { label: "FEATURED", name: "featured", widget: "boolean", default: false }
+      - { label: "ステータス", name: "status", widget: "select", options: ["Draft", "Review", "Public"], default: "Draft" }
+
+  - name: "archive"
+    label: "ARCHIVE（証拠品）"
+    folder: "_archive"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "名称", name: "title", widget: "string" }
+      - { label: "Evidence ID", name: "evidence_id", widget: "string" }
+      - { label: "価格", name: "price", widget: "number", required: false }
+      - { label: "画像", name: "image", widget: "image" }
+      - { label: "ステータス", name: "status", widget: "select", options: ["AVAILABLE", "NEW SPECIMEN", "CAPTURED", "COMING SOON"], default: "AVAILABLE" }
+      - { label: "Stripe URL", name: "stripe_url", widget: "string", required: false }
+      - { label: "調査記録", name: "description", widget: "text", required: false }
+      - { label: "発生日", name: "date", widget: "datetime", format: "YYYY.MM.DD", required: false }
+
+  - name: "signals"
+    label: "SIGNALS（ニュース）"
+    folder: "_signals"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "タイトル", name: "title", widget: "string" }
+      - { label: "日付", name: "date", widget: "datetime", format: "YYYY.MM.DD" }
+      - { label: "タイプ", name: "type", widget: "select", options: ["SPECIMEN", "EVENT", "SYSTEM", "INCIDENT"] }
+      - { label: "本文", name: "body", widget: "markdown" }
+      - { label: "ステータス", name: "status", widget: "select", options: ["Draft", "Public"], default: "Draft" }
