@@ -1,0 +1,11 @@
+{
+  "id": "kto-gallery",
+  "title": "阪急メンズ東京内 KTOギャラリーに出展",
+  "date": "[要確認]",
+  "type": "EXHIBITION",
+  "body": "TOM TED TOD が阪急メンズ東京内の KTOギャラリーに出展しています。詳細は有楽町芸術港のサイトをご覧ください。",
+  "artworks": ["TT-C001"],
+  "links": [{"label": "有楽町芸術港", "url": "https://www.artport-geijutsuko.com"}],
+  "event": "hankyu-mens-tokyo",
+  "status": "public"
+}

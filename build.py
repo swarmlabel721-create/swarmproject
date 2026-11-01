@@ -221,6 +221,7 @@ def news_row(n):
   <div class="row-body">
     <h3 class="row-title">{e(n['title'])}</h3>
     <div class="text">{paras(n.get('body'))}</div>
+    {''.join(f'<a class="signal-ext" href="{e(u["url"])}" rel="noopener" target="_blank">{e(u.get("label") or u["url"])} ↗</a>' for u in n.get("links", []))}
     {related_works(n.get('artworks', []))}
   </div>
 </li>"""
@@ -233,7 +234,7 @@ def build_home():
     logs = by_date(LOGS)[:3]
     works = ARTWORKS[:3]
     activity = by_date(
-        [dict(x, _kind="event") for x in EVENTS] + [dict(x, _kind="news") for x in NEWS]
+        [dict(x, _kind="event") for x in EVENTS] + [dict(x, _kind="news") for x in NEWS if not x.get("event")]
     )[:3]
     body = f"""
 <section class="hero" aria-label="TOM TED TOD">
