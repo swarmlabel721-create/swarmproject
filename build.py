@@ -82,7 +82,7 @@ def page(path, title, body, active="", desc=""):
 <meta name="description" content="{e(description)}">
 <meta property="og:title" content="{e(full_title)}">
 <meta property="og:description" content="{e(description)}">
-<meta property="og:image" content="{e(SITE['hero_image'])}">
+<meta property="og:image" content="{e(SITE.get('og_image', SITE['hero_image']))}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/site.css">

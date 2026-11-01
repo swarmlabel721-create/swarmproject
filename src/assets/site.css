@@ -90,9 +90,7 @@ img { max-width: 100%; display: block; }
 .hero-photo { position: relative; z-index: 2; grid-column: 2; grid-row: 1; height: calc(100vh - 48px); display: flex; align-items: center; justify-content: center; padding: 56px 24px 32px; }
 .hero-photo img {
   max-height: 100%; width: auto; max-width: 100%; object-fit: contain;
-  filter: brightness(0.86) saturate(0.85) contrast(1.02);
-  -webkit-mask-image: radial-gradient(ellipse 72% 78% at 50% 50%, #000 62%, transparent 100%);
-  mask-image: radial-gradient(ellipse 72% 78% at 50% 50%, #000 62%, transparent 100%);
+  filter: brightness(0.9) saturate(0.88) contrast(1.02) drop-shadow(0 20px 40px rgba(0,0,0,0.8));
 }
 .hero-copy { grid-column: 1; grid-row: 1; padding: 0 48px 0 clamp(24px, 6vw, 96px); position: relative; z-index: 2; }
 .signal { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.4em; color: var(--neon); margin-bottom: 18px; }
@@ -275,9 +273,10 @@ img { max-width: 100%; display: block; }
 .dossier .spec-row { grid-template-columns: 110px 1fr; }
 
 /* 旧ロゴから切り出した左右のスパイク装飾 */
-.side-orn { position: absolute; bottom: 0; height: 84%; width: auto; z-index: 1; pointer-events: none; opacity: 0.6; }
-.side-orn-l { left: 0; }
-.side-orn-r { right: 0; }
+.side-orn { position: absolute; bottom: 4%; height: 84%; width: auto; z-index: 1; pointer-events: none; opacity: 0.8; }
+/* トゲを内側へ寄せ、外側の切り口だけ薄くフェード */
+.side-orn-l { left: calc(50% - 40px); -webkit-mask-image: linear-gradient(to right, transparent 0, #000 7%); mask-image: linear-gradient(to right, transparent 0, #000 7%); }
+.side-orn-r { right: clamp(8px, 2vw, 32px); -webkit-mask-image: linear-gradient(to left, transparent 0, #000 7%); mask-image: linear-gradient(to left, transparent 0, #000 7%); }
 
 /* ── MOBILE ── */
 @media (max-width: 1060px) {
@@ -304,7 +303,8 @@ img { max-width: 100%; display: block; }
   .hero-copy { grid-column: 1; grid-row: 2; padding: 28px 16px 48px; }
   .hud-bl, .case-tag, .tape-left, .tape-right, .hud-fixed, .sidebar { display: none; }
   .lightning-svg { height: 35%; }
-  .side-orn { height: 46%; top: 48px; bottom: auto; opacity: 0.6; }
+  .side-orn { height: 46%; top: 48px; bottom: auto; opacity: 0.65; }
+  .side-orn-l { left: 14px; } .side-orn-r { right: 14px; }
   .page-head { flex-direction: column; align-items: flex-start; }
   .rec-count { text-align: left; }
   .signals-grid { grid-template-columns: 1fr; }
