@@ -1,7 +1,34 @@
 [build]
-  publish = "/"
+  command = "python3 build.py"
+  publish = "dist"
 
 [[redirects]]
   from = "/admin/*"
   to = "/admin/index.html"
   status = 200
+
+# 旧ページのURL（CREATURE WORKS 時代）を新ページへ
+[[redirects]]
+  from = "/index.html"
+  to = "/"
+  status = 301
+[[redirects]]
+  from = "/archive.html"
+  to = "/archive/"
+  status = 301
+[[redirects]]
+  from = "/fieldnotes.html"
+  to = "/earth-log/"
+  status = 301
+[[redirects]]
+  from = "/crew.html"
+  to = "/encounters/"
+  status = 301
+[[redirects]]
+  from = "/figure.jpg"
+  to = "/images/figure.jpg"
+  status = 301
+[[redirects]]
+  from = "/figure2.jpg"
+  to = "/images/figure2.jpg"
+  status = 301
