@@ -146,6 +146,10 @@ img { max-width: 100%; display: block; }
 .work-img img { width: 100%; height: 100%; object-fit: contain; filter: brightness(0.85) saturate(0.88); transition: filter 0.3s; }
 .work-card:hover .work-img img { filter: brightness(0.98) saturate(0.95); }
 .work-img .noimg { height: 100%; }
+.noimg { flex-direction: column; gap: 10px; padding: 16px; }
+.noimg-label { letter-spacing: 0.2em; }
+.noimg-hint { color: var(--dim); }
+.noimg-hint b { display: inline-block; margin-top: 4px; font-weight: 400; color: var(--neon); font-size: 0.7rem; line-height: 1.6; border: 1px dashed rgba(57,255,20,0.45); padding: 4px 8px; }
 .tag-kind { position: absolute; top: 10px; left: 10px; background: rgba(6,6,6,0.85); }
 .work-info { padding: 14px 16px 18px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
 .work-info .mono.dim { font-size: 0.6rem; }

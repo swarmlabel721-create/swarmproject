@@ -147,20 +147,28 @@ def empty(msg):
     return f'<p class="empty">// {e(msg)}</p>'
 
 
-def img_tag(img, cls="", loading="lazy"):
+def img_tag(img, cls="", loading="lazy", hint=""):
     if not img:
-        return f'<div class="noimg {cls}" role="img" aria-label="写真準備中"><span>NO IMAGE<br>[要確認] 写真提供待ち</span></div>'
+        h = f'<span class="noimg-hint">ここに入る写真<br><b>{e(hint)}</b></span>' if hint else '<span>[要確認] 写真提供待ち</span>'
+        return f'<div class="noimg {cls}" role="img" aria-label="写真準備中{("：" + e(hint)) if hint else ""}"><span class="noimg-label">NO IMAGE</span>{h}</div>'
     return f'<img class="{cls}" src="{e(img["src"])}" alt="{e(img.get("alt", ""))}" loading="{loading}">'
 
 
 # ---------- cards ----------
+
+def art_hint(a):
+    return a.get("image_hint") or ("素体の全身写真（正面・未塗装）" if a.get("kind") != "custom" else "この作品の全身写真（正面）")
+
+
+LOG_HINT = "街で撮った TOM TED TOD の実写（その日・その場所の1枚）"
+
 
 def artwork_card(a):
     img = a["images"][0] if a.get("images") else None
     kind = "CUSTOM" if a.get("kind") == "custom" else "BASE"
     artist = ARTISTS.get(a.get("artist", ""), {}).get("display_name", "")
     return f"""<a class="work-card" href="/archive/{slug(a['id'])}/">
-  <div class="work-img">{img_tag(img)}<span class="specimen">RECORD #{e(a['id'])}</span><span class="tag tag-kind">{kind}</span></div>
+  <div class="work-img">{img_tag(img, hint=art_hint(a))}<span class="specimen">RECORD #{e(a['id'])}</span><span class="tag tag-kind">{kind}</span></div>
   <div class="work-info">
     <span class="mono dim">{e(a['id'])} / {e(a.get('year'))}</span>
     <span class="work-title">{e(a['title'])}</span>
@@ -173,12 +181,23 @@ def artwork_card(a):
 def log_card(l):
     img = l["images"][0] if l.get("images") else None
     return f"""<article class="log-card" data-date="{e(l.get('date'))}">
-  <div class="log-img">{img_tag(img)}</div>
+  <div class="log-img">{img_tag(img, hint=LOG_HINT)}</div>
   <div class="log-body">
     <p class="meta"><span class="date">{e(l.get('date'))}</span><span class="tag">LOCATION: {e(l.get('place'))}</span>{sample_tag(l)}</p>
     <h3 class="log-title">{e(l['title'])}</h3>
     <div class="text">{paras(l.get('body'))}</div>
     {related_works(l.get('artworks', []))}
+  </div>
+</article>"""
+
+
+def log_placeholder():
+    return f"""<article class="log-card log-empty">
+  <div class="log-img">{img_tag(None, hint=LOG_HINT)}</div>
+  <div class="log-body">
+    <p class="meta"><span class="date">----.--.--</span><span class="tag">LOCATION: ----</span></p>
+    <h3 class="log-title">観察記録 準備中</h3>
+    <div class="text"><p>街で撮った写真が、日付・場所・短い記録といっしょにここへ並びます。</p></div>
   </div>
 </article>"""
 
@@ -277,7 +296,7 @@ def build_home():
 
 <section class="section">
   {section_head("EARTH LOG", "// 02 LATEST", ("ALL LOGS", "/earth-log/"))}
-  <div class="log-list" data-live-logs data-limit="3">{''.join(log_card(l) for l in logs) or empty('記録準備中')}</div>
+  <div class="log-list" data-live-logs data-limit="3">{''.join(log_card(l) for l in logs) or log_placeholder()}</div>
 </section>
 
 <section class="section">
@@ -316,7 +335,7 @@ def build_origin():
 def build_earthlog():
     logs = by_date(LOGS)
     body = f"""{header("FIELD OBSERVATION / EARTH LOG", "EARTH LOG", SITE['earthlog_intro'], "// LOG", ("TOTAL LOGS", len(logs), "OBSERVATION ONGOING"))}
-<section class="section"><div class="log-list" data-live-logs>{''.join(log_card(l) for l in logs) or empty('記録準備中')}</div></section>"""
+<section class="section"><div class="log-list" data-live-logs>{''.join(log_card(l) for l in logs) or log_placeholder()}</div></section>"""
     page("/earth-log/", "EARTH LOG", body, "EARTH LOG")
 
 
@@ -355,7 +374,7 @@ def build_artwork(a):
     artist = ARTISTS.get(a.get("artist", ""))
     imgs = a.get("images") or [None]
     gallery = "".join(
-        f'<figure>{img_tag(i, loading="eager" if n == 0 else "lazy")}'
+        f'<figure>{img_tag(i, loading="eager" if n == 0 else "lazy", hint=art_hint(a))}'
         + (f'<figcaption class="mono small dim">PHOTO: {e(i.get("credit"))}</figcaption>' if i and i.get("credit") else "")
         + "</figure>"
         for n, i in enumerate(imgs)
