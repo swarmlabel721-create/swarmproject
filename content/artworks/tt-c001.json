@@ -1,0 +1,18 @@
+{
+  "id": "TT-C001",
+  "title": "[要確認] 作品名",
+  "year": "[要確認]",
+  "kind": "custom",
+  "order": 1,
+  "status": "public",
+  "artist": "artist-tbd",
+  "images": [
+    {"src": "/images/figure.jpg", "alt": "TOM TED TODのカスタム作品。緑の身体の前面にピンクと黄色の文字と顔の模様が描かれている。", "credit": "[要確認] 撮影者・権利者"}
+  ],
+  "technique": "[要確認] 技法・素材",
+  "context": "[要確認] 文化的背景",
+  "description": "参加作家がTOM TED TODの素体に手を加えたカスタム作品。[要確認] 作品解説は作家の確認後に掲載します。",
+  "history": [],
+  "links": [],
+  "rights_note": "非公開メモ：写真の使用許可・作家の公開名義を確認すること"
+}
