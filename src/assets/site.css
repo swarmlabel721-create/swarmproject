@@ -11,6 +11,7 @@
   --faint: rgba(239,239,239,0.28);
   --border: rgba(255,255,255,0.08);
   --grid: rgba(255,255,255,0.03);
+  --red: #ff3b3b;
   --mono: 'Share Tech Mono', ui-monospace, monospace;
   --display: 'Bebas Neue', 'Noto Sans JP', sans-serif;
 }
@@ -217,6 +218,62 @@ img { max-width: 100%; display: block; }
 .footer-sys a { color: var(--dim); text-decoration: none; }
 .footer-sys a:hover { color: var(--neon); }
 
+/* ── 旧デザインから継承した演出 ── */
+.ticker-wrap { width: 100%; overflow: hidden; background: var(--neon); padding: 6px 0; position: relative; z-index: 2; }
+.ticker { display: flex; white-space: nowrap; width: max-content; animation: ticker 36s linear infinite; }
+.ticker > span { font-family: var(--display); font-size: 0.82rem; letter-spacing: 0.22em; color: var(--black); padding: 0 24px; }
+.ticker .sep { color: rgba(0,0,0,0.4); }
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+.tape-left, .tape-right { position: absolute; top: 0; bottom: 0; width: 2px; z-index: 1; pointer-events: none;
+  background: repeating-linear-gradient(to bottom, transparent 0, transparent 6px, rgba(57,255,20,0.12) 6px, rgba(57,255,20,0.12) 12px); }
+.tape-left { left: 52px; } .tape-right { right: 52px; }
+.lightning-svg { position: absolute; bottom: 0; left: 0; right: 0; width: 100%; height: 55%; z-index: 1; pointer-events: none; }
+.hud-icon { width: 28px; height: 28px; border: 1px solid rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; margin-bottom: 8px; }
+.hud-icon-r { margin-left: auto; }
+.case-tag { position: absolute; bottom: 28px; right: 24px; z-index: 4; width: 116px; border: 1px solid rgba(255,255,255,0.15); background: rgba(6,6,6,0.92); pointer-events: none; }
+.case-tag img { width: 100%; filter: grayscale(100%) brightness(0.6) contrast(1.2); }
+.case-label { font-family: var(--mono); font-size: 0.5rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.45); padding: 5px 7px; line-height: 1.6; }
+.case-id { color: var(--red); font-family: var(--mono); letter-spacing: 0.1em; }
+.signal { text-shadow: 0 0 12px rgba(57,255,20,0.8), 0 0 36px rgba(57,255,20,0.25); }
+.cta-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 30px; }
+.btn-red { background: transparent; border-color: rgba(255,59,59,0.45); color: var(--red); }
+.btn-red:hover { background: var(--red); color: var(--black); }
+.btn-primary:hover { box-shadow: 0 0 20px rgba(57,255,20,0.5); }
+
+.hud-fixed { position: fixed; bottom: 18px; left: 18px; z-index: 50; font-family: var(--mono); font-size: 0.54rem; letter-spacing: 0.08em; color: rgba(255,255,255,0.22); line-height: 1.8; pointer-events: none; }
+.page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; }
+.rec-count { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.15em; color: var(--faint); text-align: right; line-height: 2; white-space: nowrap; }
+.rec-num { font-size: 1.5rem; color: var(--white); letter-spacing: 0.1em; }
+
+.specimen { position: absolute; top: 10px; right: 10px; font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.1em; padding: 2px 7px; background: rgba(6,6,6,0.85); border: 1px solid rgba(57,255,20,0.4); color: var(--neon); }
+.work-status { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; color: var(--neon); margin-top: 2px; }
+
+.signals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.signal-card { background: var(--black); border: 1px solid var(--border); padding: 22px 20px; display: flex; flex-direction: column; gap: 8px; text-decoration: none; min-height: 150px; transition: background 0.2s; }
+.signal-card:hover { background: var(--panel); }
+.signal-title { font-size: 0.88rem; line-height: 1.7; font-weight: 400; }
+.signal-more { margin-top: auto; font-family: var(--display); font-size: 0.72rem; letter-spacing: 0.15em; color: var(--faint); }
+.signal-card:hover .signal-more { color: var(--neon); }
+
+.with-sidebar { display: flex; max-width: 1140px; margin: 0 auto; }
+.sidebar { width: 200px; flex-shrink: 0; padding: 64px 20px 40px clamp(16px, 5vw, 60px); border-right: 1px solid var(--border); }
+.sidebar-main { flex: 1; min-width: 0; }
+.sidebar-main .section { max-width: none; }
+.filter-label { font-family: var(--display); font-size: 0.7rem; letter-spacing: 0.4em; color: var(--faint); margin-bottom: 12px; }
+.filter-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.filter-list a { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.1em; color: var(--dim); text-decoration: none; padding: 5px 0 5px 10px; border-left: 1px solid var(--border); }
+.filter-list a:hover { color: var(--neon); border-left-color: var(--neon); }
+.filter-list span { color: var(--faint); }
+.sidebar-div { height: 1px; background: var(--border); margin: 22px 0; }
+
+.dossier-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+.dossier { border: 1px solid var(--border); padding: 18px 20px; }
+.dossier-head { display: flex; justify-content: space-between; align-items: center; font-size: 0.62rem; margin-bottom: 12px; }
+.dossier-name { font-family: var(--display); font-size: 1.5rem; letter-spacing: 0.06em; margin-bottom: 6px; }
+.dossier .spec { margin-bottom: 0; }
+.dossier .spec-row { grid-template-columns: 110px 1fr; }
+
 /* ── MOBILE ── */
 @media (max-width: 1060px) {
   .nav-status { display: none; }
@@ -240,7 +297,12 @@ img { max-width: 100%; display: block; }
   .hero-photo { grid-column: 1; grid-row: 1; height: auto; padding: 56px 16px 0; }
   .hero-photo img { max-height: 62vh; }
   .hero-copy { grid-column: 1; grid-row: 2; padding: 28px 16px 48px; }
-  .hud-bl { display: none; }
+  .hud-bl, .case-tag, .tape-left, .tape-right, .hud-fixed, .sidebar { display: none; }
+  .lightning-svg { height: 35%; }
+  .page-head { flex-direction: column; align-items: flex-start; }
+  .rec-count { text-align: left; }
+  .signals-grid { grid-template-columns: 1fr; }
+  .dossier-grid { grid-template-columns: 1fr; }
 
   .origin, .work-detail, .connect { grid-template-columns: 1fr; }
   .origin-photo, .work-gallery { max-width: 420px; }

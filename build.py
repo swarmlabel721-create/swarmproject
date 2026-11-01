@@ -102,7 +102,7 @@ def page(path, title, body, active="", desc=""):
   <ul class="footer-links">{nav}</ul>
   <div class="footer-sys">
     <a href="{e(SITE['x_url'])}" rel="noopener" target="_blank">X {e(SITE['x_handle'])}</a><br>
-    {e(SITE['name'])} / EARTH OBSERVATION LOG
+    {e(SITE['name'])} / SYSTEM v4.0<br>EARTH OBSERVATION LOG
   </div>
 </footer>
 <script src="/assets/site.js" defer></script>
@@ -114,11 +114,27 @@ def page(path, title, body, active="", desc=""):
     out.write_text(html, encoding="utf-8")
 
 
-def header(eyebrow, title, intro="", code=""):
-    return f"""<section class="page-head">
-  <p class="eyebrow">{e(eyebrow)}<span class="code">{e(code)}</span></p>
-  <h1 class="page-title">{e(title)}</h1>
-  {f'<p class="lead">{e(intro)}</p>' if intro else ''}
+TICKER_WORDS = ["AN ALIEN IN LOVE WITH EARTH", "SIGNAL RECEIVED", "EARTH LOG UPDATED", "ENCOUNTER RECORDED", "CULTURE OBSERVED", "THE JOURNEY CONTINUES"]
+
+
+def ticker(words=TICKER_WORDS):
+    items = "".join(f'<span>{e(w)} <span class="sep">✦</span></span>' for w in words) * 2
+    return f'<div class="ticker-wrap" aria-hidden="true"><div class="ticker">{items}</div></div>'
+
+
+def header(eyebrow, title, intro="", code="", count=None):
+    cnt = ""
+    if count:
+        cnt = f'<div class="rec-count" aria-hidden="true">{e(count[0])}<br><span class="rec-num">{count[1]:02d}</span><br>{e(count[2])}</div>'
+    return f"""{ticker()}
+<div class="hud-fixed" aria-hidden="true">X -26.2041<br>Y 127.6791<br>──────────<br>LOCATION: EARTH / {e(title)}</div>
+<section class="page-head">
+  <div>
+    <p class="eyebrow">{e(eyebrow)}<span class="code">{e(code)}</span></p>
+    <h1 class="page-title">{e(title)}</h1>
+    {f'<p class="lead">{e(intro)}</p>' if intro else ''}
+  </div>
+  {cnt}
 </section>"""
 
 
@@ -144,11 +160,12 @@ def artwork_card(a):
     kind = "CUSTOM" if a.get("kind") == "custom" else "BASE"
     artist = ARTISTS.get(a.get("artist", ""), {}).get("display_name", "")
     return f"""<a class="work-card" href="/archive/{slug(a['id'])}/">
-  <div class="work-img">{img_tag(img)}<span class="tag tag-kind">{kind}</span></div>
+  <div class="work-img">{img_tag(img)}<span class="specimen">RECORD #{e(a['id'])}</span><span class="tag tag-kind">{kind}</span></div>
   <div class="work-info">
     <span class="mono dim">{e(a['id'])} / {e(a.get('year'))}</span>
     <span class="work-title">{e(a['title'])}</span>
     {f'<span class="mono small">ARTIST: {e(artist)}</span>' if artist else ''}
+    <span class="work-status">▸ ON JOURNEY</span>
   </div>
 </a>"""
 
@@ -186,6 +203,15 @@ def event_row(ev):
 </li>"""
 
 
+def signal_card(x):
+    href = f"/encounters/#{x['id']}" if x.get('_kind') == 'event' else f"/signals/#{x['id']}"
+    return f"""<a class="signal-card" href="{href}">
+  <p class="meta"><span class="date">{e(x.get('date'))}</span><span class="tag">{e(x.get('type'))}</span></p>
+  <span class="signal-title">{e(x['title'])}</span>
+  <span class="signal-more">OPEN FILE →</span>
+</a>"""
+
+
 def news_row(n):
     return f"""<li class="row" id="{e(n['id'])}">
   <span class="date">{e(n.get('date'))}</span>
@@ -206,22 +232,39 @@ def build_home():
     works = ARTWORKS[:3]
     activity = by_date(
         [dict(x, _kind="event") for x in EVENTS] + [dict(x, _kind="news") for x in NEWS]
-    )[:4]
+    )[:3]
     body = f"""
 <section class="hero" aria-label="TOM TED TOD">
   <div class="hero-photo">
     <img src="{e(SITE['hero_image'])}" alt="{e(SITE['hero_image_alt'])}" fetchpriority="high">
   </div>
-  <div class="hud hud-tl" aria-hidden="true">CASE TTT-001<br>─────<br>SUBJECT ACTIVE</div>
-  <div class="hud hud-tr" aria-hidden="true"><span class="rec">● REC</span><br>─────<br>CAM_01</div>
-  <div class="hud hud-bl" aria-hidden="true">LOCATION<br>EARTH</div>
+  <div class="tape-left" aria-hidden="true"></div><div class="tape-right" aria-hidden="true"></div>
+  <svg class="lightning-svg" aria-hidden="true" viewBox="0 0 1440 400" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+    <defs><filter id="gl"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <g filter="url(#gl)" opacity="0.35"><polyline points="200,0 170,70 188,64 138,170 162,158 92,310 118,300 52,400" fill="none" stroke="#39ff14" stroke-width="1.2"/><polyline points="180,0 150,80 172,72 112,200 140,188 72,380" fill="none" stroke="#39ff14" stroke-width="0.7" opacity="0.5"/></g>
+    <g filter="url(#gl)" opacity="0.35"><polyline points="1240,0 1270,70 1252,64 1302,170 1278,158 1348,310 1322,300 1388,400" fill="none" stroke="#39ff14" stroke-width="1.2"/><polyline points="1260,0 1290,80 1268,72 1328,200 1300,188 1368,380" fill="none" stroke="#39ff14" stroke-width="0.7" opacity="0.5"/></g>
+    <g opacity="0.16"><path d="M60,400 Q160,362 240,378 Q320,392 400,368 Q480,344 540,362" fill="none" stroke="#39ff14" stroke-width="0.8"/><path d="M900,366 Q980,346 1060,364 Q1140,380 1220,356 Q1340,336 1410,374" fill="none" stroke="#39ff14" stroke-width="0.8"/></g>
+  </svg>
+  <div class="hud hud-tl" aria-hidden="true"><div class="hud-icon">⊞</div>SYS_01<br>BOOT_OK<br>─────<br>⊕ GRID</div>
+  <div class="hud hud-tr" aria-hidden="true"><div class="hud-icon hud-icon-r">⊕</div><span class="rec">● REC</span><br>─────<br>CAM_01</div>
+  <div class="hud hud-bl" aria-hidden="true">X -26.2041<br>Y 127.6791<br>LOCATION: EARTH</div>
+  <div class="case-tag" aria-hidden="true">
+    <img src="/images/figure2.jpg" alt="">
+    <div class="case-label"><span class="case-id">CASE #TTT-001</span><br>SUBJECT ACTIVE<br>LOCATION: EARTH</div>
+  </div>
   <div class="hero-copy">
-    <p class="signal">▸ SIGNAL RECEIVED</p>
+    <p class="signal">▸ TRANSMISSION DETECTED</p>
     <h1 class="hero-title">{e(SITE['hero_title'])}</h1>
     <p class="hero-en">{e(SITE['hero_en'])}<br><span>{e(SITE['hero_en_sub'])}</span></p>
     <p class="hero-ja">{ja}</p>
+    <div class="cta-row">
+      <a href="/archive/" class="btn btn-primary">VIEW ARCHIVE</a>
+      <a href="/earth-log/" class="btn btn-ghost">EARTH LOG</a>
+      <a href="/connect/" class="btn btn-red">CONNECT</a>
+    </div>
   </div>
 </section>
+{ticker()}
 
 <section class="section">
   {section_head("WHO IS HE", "// 01 ORIGIN", ("ORIGIN", "/origin/"))}
@@ -239,8 +282,8 @@ def build_home():
 </section>
 
 <section class="section">
-  {section_head("RECENT ACTIVITY", "// 04 EXHIBITION / SIGNALS", ("SIGNALS", "/signals/"))}
-  <ul class="rows">{''.join(event_row(x) if x['_kind'] == 'event' else news_row(x) for x in activity) or empty('準備中')}</ul>
+  {section_head("LATEST SIGNALS", "// 04 EXHIBITION / SIGNALS", ("SIGNALS", "/signals/"))}
+  <div class="signals-grid">{''.join(signal_card(x) for x in activity) or empty('準備中')}</div>
 </section>
 
 <section class="section connect-band">
@@ -273,7 +316,7 @@ def build_origin():
 
 def build_earthlog():
     logs = by_date(LOGS)
-    body = f"""{header("FIELD OBSERVATION / EARTH LOG", "EARTH LOG", SITE['earthlog_intro'], f"// {len(logs):02d} ENTRIES")}
+    body = f"""{header("FIELD OBSERVATION / EARTH LOG", "EARTH LOG", SITE['earthlog_intro'], "// LOG", ("TOTAL LOGS", len(logs), "OBSERVATION ONGOING"))}
 <section class="section"><div class="log-list">{''.join(log_card(l) for l in logs) or empty('記録準備中')}</div></section>"""
     page("/earth-log/", "EARTH LOG", body, "EARTH LOG")
 
@@ -281,15 +324,29 @@ def build_earthlog():
 def build_archive():
     customs = [a for a in ARTWORKS if a.get("kind") == "custom"]
     bases = [a for a in ARTWORKS if a.get("kind") != "custom"]
-    body = f"""{header("WORK RECORDS / ARCHIVE", "ARCHIVE", SITE['archive_intro'], f"// {len(ARTWORKS):02d} RECORDS")}
-<section class="section">
-  {section_head("BASE BODY", "// 素体")}
-  <div class="work-grid">{''.join(artwork_card(a) for a in bases) or empty('準備中')}</div>
-</section>
-<section class="section">
-  {section_head("CUSTOM WORKS", "// カスタム作品")}
-  <div class="work-grid">{''.join(artwork_card(a) for a in customs) or empty('準備中')}</div>
-</section>"""
+    body = f"""{header("WORK RECORDS / ARCHIVE", "ARCHIVE", SITE['archive_intro'], "// EVIDENCE CATALOG", ("TOTAL RECORDS", len(ARTWORKS), f"BASE: {len(bases):02d} / CUSTOM: {len(customs):02d}"))}
+<div class="with-sidebar">
+  <aside class="sidebar" aria-label="種別">
+    <p class="filter-label">TYPE</p>
+    <ul class="filter-list">
+      <li><a href="#base">BASE BODY <span>{len(bases):02d}</span></a></li>
+      <li><a href="#custom">CUSTOM WORKS <span>{len(customs):02d}</span></a></li>
+    </ul>
+    <div class="sidebar-div"></div>
+    <p class="filter-label">RECORD</p>
+    <ul class="filter-list">{''.join(f'<li><a href="/archive/{slug(a["id"])}/">{e(a["id"])}</a></li>' for a in ARTWORKS)}</ul>
+  </aside>
+  <div class="sidebar-main">
+    <section class="section" id="base">
+      {section_head("BASE BODY", "// 素体")}
+      <div class="work-grid">{''.join(artwork_card(a) for a in bases) or empty('準備中')}</div>
+    </section>
+    <section class="section" id="custom">
+      {section_head("CUSTOM WORKS", "// カスタム作品")}
+      <div class="work-grid">{''.join(artwork_card(a) for a in customs) or empty('準備中')}</div>
+    </section>
+  </div>
+</div>"""
     page("/archive/", "ARCHIVE", body, "ARCHIVE")
     for a in ARTWORKS:
         build_artwork(a)
@@ -350,25 +407,31 @@ def build_artwork(a):
 def build_encounters():
     evs = by_date(EVENTS)
     artists = [a for a in ARTISTS.values()]
-    artist_html = "".join(
-        f'<div class="spec-row"><span class="spec-key">{e(a["display_name"])}</span><span class="spec-val">{e(a.get("bio"))}</span></div>'
-        for a in artists
-    )
-    body = f"""{header("COLLABORATION RECORDS / ENCOUNTERS", "ENCOUNTERS", SITE['encounters_intro'], f"// {len(evs):02d} RECORDS")}
+    def dossier(n, a):
+        works = [w["id"] for w in ARTWORKS if w.get("artist") == a["id"]]
+        rows = [("NAME POLICY", a.get("name_policy")), ("WORKS", " / ".join(works)), ("PROFILE", a.get("bio"))]
+        rows_html = "".join(f'<div class="spec-row"><span class="spec-key">{k}</span><span class="spec-val">{e(v)}</span></div>' for k, v in rows if v)
+        return f"""<div class="dossier">
+  <div class="dossier-head"><span class="case-id">CASE FILE: NO.{n:03d}</span><span class="tag">ACTIVE</span></div>
+  <div class="dossier-name">{e(a["display_name"])}</div>
+  <div class="spec">{rows_html}</div>
+</div>"""
+    artist_html = "".join(dossier(i + 1, a) for i, a in enumerate(artists))
+    body = f"""{header("COLLABORATION RECORDS / ENCOUNTERS", "ENCOUNTERS", SITE['encounters_intro'], "// DOSSIER", ("TOTAL RECORDS", len(evs), f"ARTISTS: {len(artists):02d}"))}
 <section class="section">
   {section_head("EXHIBITIONS & PROJECTS", "// 展示・企画")}
   <ul class="rows">{''.join(event_row(x) for x in evs) or empty('準備中')}</ul>
 </section>
 <section class="section">
   {section_head("ARTISTS", "// 参加作家")}
-  <div class="spec">{artist_html or empty('準備中')}</div>
+  <div class="dossier-grid">{artist_html or empty('準備中')}</div>
 </section>"""
     page("/encounters/", "ENCOUNTERS", body, "ENCOUNTERS")
 
 
 def build_signals():
     ns = by_date(NEWS)
-    body = f"""{header("TRANSMISSIONS / SIGNALS", "SIGNALS", SITE['signals_intro'], f"// {len(ns):02d} SIGNALS")}
+    body = f"""{header("TRANSMISSIONS / SIGNALS", "SIGNALS", SITE['signals_intro'], "// TRANSMISSION", ("TOTAL SIGNALS", len(ns), "RECEIVING"))}
 <section class="section"><ul class="rows">{''.join(news_row(x) for x in ns) or empty('準備中')}</ul></section>"""
     page("/signals/", "SIGNALS", body, "SIGNALS")
 
