@@ -253,6 +253,11 @@ img { max-width: 100%; display: block; }
 .signal-title { font-size: 0.88rem; line-height: 1.7; font-weight: 400; }
 .signal-more { margin-top: auto; font-family: var(--display); font-size: 0.72rem; letter-spacing: 0.15em; color: var(--faint); }
 .signal-card:hover .signal-more { color: var(--neon); }
+.signal-title { color: var(--white); text-decoration: none; }
+.signal-title:hover { color: var(--neon); }
+.signal-more { text-decoration: none; }
+.signal-ext { align-self: flex-start; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; color: var(--neon); text-decoration: none; border: 1px solid rgba(57,255,20,0.4); padding: 4px 10px; margin-top: 4px; }
+.signal-ext:hover { background: rgba(57,255,20,0.1); }
 
 .with-sidebar { display: flex; max-width: 1140px; margin: 0 auto; }
 .sidebar { width: 200px; flex-shrink: 0; padding: 64px 20px 40px clamp(16px, 5vw, 60px); border-right: 1px solid var(--border); }

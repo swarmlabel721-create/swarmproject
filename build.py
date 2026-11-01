@@ -205,11 +205,13 @@ def event_row(ev):
 
 def signal_card(x):
     href = f"/encounters/#{x['id']}" if x.get('_kind') == 'event' else f"/signals/#{x['id']}"
-    return f"""<a class="signal-card" href="{href}">
+    ext = "".join(f'<a class="signal-ext" href="{e(u["url"])}" rel="noopener" target="_blank">{e(u.get("label") or u["url"])} ↗</a>' for u in x.get("links", []))
+    return f"""<div class="signal-card">
   <p class="meta"><span class="date">{e(x.get('date'))}</span><span class="tag">{e(x.get('type'))}</span></p>
-  <span class="signal-title">{e(x['title'])}</span>
-  <span class="signal-more">OPEN FILE →</span>
-</a>"""
+  <a class="signal-title" href="{href}">{e(x['title'])}</a>
+  {ext}
+  <a class="signal-more" href="{href}">OPEN FILE →</a>
+</div>"""
 
 
 def news_row(n):
