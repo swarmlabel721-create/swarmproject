@@ -238,6 +238,8 @@ def build_home():
   <div class="hero-photo">
     <img src="{e(SITE['hero_image'])}" alt="{e(SITE['hero_image_alt'])}" fetchpriority="high">
   </div>
+  <img class="side-orn side-orn-l" src="/images/hero-side-l.png" alt="" aria-hidden="true">
+  <img class="side-orn side-orn-r" src="/images/hero-side-r.png" alt="" aria-hidden="true">
   <div class="tape-left" aria-hidden="true"></div><div class="tape-right" aria-hidden="true"></div>
   <svg class="lightning-svg" aria-hidden="true" viewBox="0 0 1440 400" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
     <defs><filter id="gl"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
