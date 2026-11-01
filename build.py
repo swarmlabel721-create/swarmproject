@@ -172,7 +172,7 @@ def artwork_card(a):
 
 def log_card(l):
     img = l["images"][0] if l.get("images") else None
-    return f"""<article class="log-card">
+    return f"""<article class="log-card" data-date="{e(l.get('date'))}">
   <div class="log-img">{img_tag(img)}</div>
   <div class="log-body">
     <p class="meta"><span class="date">{e(l.get('date'))}</span><span class="tag">LOCATION: {e(l.get('place'))}</span>{sample_tag(l)}</p>
@@ -275,7 +275,7 @@ def build_home():
 
 <section class="section">
   {section_head("EARTH LOG", "// 02 LATEST", ("ALL LOGS", "/earth-log/"))}
-  <div class="log-list">{''.join(log_card(l) for l in logs) or empty('記録準備中')}</div>
+  <div class="log-list" data-live-logs data-limit="3">{''.join(log_card(l) for l in logs) or empty('記録準備中')}</div>
 </section>
 
 <section class="section">
@@ -314,7 +314,7 @@ def build_origin():
 def build_earthlog():
     logs = by_date(LOGS)
     body = f"""{header("FIELD OBSERVATION / EARTH LOG", "EARTH LOG", SITE['earthlog_intro'], "// LOG", ("TOTAL LOGS", len(logs), "OBSERVATION ONGOING"))}
-<section class="section"><div class="log-list">{''.join(log_card(l) for l in logs) or empty('記録準備中')}</div></section>"""
+<section class="section"><div class="log-list" data-live-logs>{''.join(log_card(l) for l in logs) or empty('記録準備中')}</div></section>"""
     page("/earth-log/", "EARTH LOG", body, "EARTH LOG")
 
 
@@ -476,6 +476,30 @@ def build_404():
     (DIST / "404").rmdir()
 
 
+def build_upload():
+    body = f"""{header("FIELD UPLINK / UPLOAD", "UPLOAD", "撮った写真を EARTH LOG に追加します。投稿はすぐサイトに反映されます。", "// UPLINK")}
+<section class="section upload">
+  <form id="upload-form" class="form" autocomplete="off">
+    <label class="field"><span class="field-label">PASSWORD</span><input type="password" name="password" required autocomplete="current-password"></label>
+    <label class="field"><span class="field-label">PHOTO / 写真</span><input type="file" name="photo" accept="image/*" required></label>
+    <div class="upload-preview" hidden><img alt=""></div>
+    <label class="field"><span class="field-label">TITLE / タイトル</span><input type="text" name="title" maxlength="80" required></label>
+    <label class="field"><span class="field-label">DATE / 日付</span><input type="date" name="date" required></label>
+    <label class="field"><span class="field-label">LOCATION / 場所（任意）</span><input type="text" name="place" maxlength="60"></label>
+    <label class="field"><span class="field-label">TEXT / 短文（任意）</span><textarea name="body" rows="4" maxlength="1000"></textarea></label>
+    <label class="field"><span class="field-label">ALT / 写真の説明（任意・読み上げ用）</span><input type="text" name="alt" maxlength="120"></label>
+    <button type="submit" class="btn btn-primary">UPLOAD ▸</button>
+    <p class="mono small upload-status" role="status" aria-live="polite"></p>
+  </form>
+  <div class="upload-manage">
+    {section_head("POSTED", "// 投稿済み（削除はここから）")}
+    <ul class="upload-list mono small"></ul>
+  </div>
+</section>
+<script src="/assets/upload.js" defer></script>"""
+    page("/upload/", "UPLOAD", body, noindex=True)
+
+
 def main():
     if DIST.exists():
         shutil.rmtree(DIST)
@@ -491,6 +515,7 @@ def main():
     build_encounters()
     build_signals()
     build_connect()
+    build_upload()
     build_404()
     print(f"built: production={PRODUCTION} artworks={len(ARTWORKS)} logs={len(LOGS)} events={len(EVENTS)} news={len(NEWS)}")
 
