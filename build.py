@@ -62,11 +62,11 @@ NAV = [
     ("ARCHIVE", "/archive/"),
     ("ENCOUNTERS", "/encounters/"),
     ("SIGNALS", "/signals/"),
-    ("CONNECT", "/connect/"),
+
 ]
 
 
-def page(path, title, body, active="", desc=""):
+def page(path, title, body, active="", desc="", noindex=False):
     nav = "".join(
         f'<li><a href="{href}"{" aria-current=\"page\"" if label == active else ""}>{label}</a></li>'
         for label, href in NAV
@@ -79,7 +79,7 @@ def page(path, title, body, active="", desc=""):
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{e(full_title)}</title>
-<meta name="description" content="{e(description)}">
+<meta name="description" content="{e(description)}">{chr(10) + '<meta name="robots" content="noindex">' if noindex else ""}
 <meta property="og:title" content="{e(full_title)}">
 <meta property="og:description" content="{e(description)}">
 <meta property="og:image" content="{e(SITE.get('og_image', SITE['hero_image']))}">
@@ -101,7 +101,7 @@ def page(path, title, body, active="", desc=""):
 <footer class="footer">
   <ul class="footer-links">{nav}</ul>
   <div class="footer-sys">
-    <a href="{e(SITE['x_url'])}" rel="noopener" target="_blank">X {e(SITE['x_handle'])}</a><br>
+    <a href="{e(SITE['x_url'])}" rel="noopener" target="_blank">X {e(SITE['x_handle'])}</a> / <a href="/connect/">FOR ARTISTS</a><br>
     {e(SITE['name'])} / SYSTEM v4.0<br>EARTH OBSERVATION LOG
   </div>
 </footer>
@@ -262,7 +262,7 @@ def build_home():
     <div class="cta-row">
       <a href="/archive/" class="btn btn-primary">VIEW ARCHIVE</a>
       <a href="/earth-log/" class="btn btn-ghost">EARTH LOG</a>
-      <a href="/connect/" class="btn btn-red">CONNECT</a>
+      <a href="/signals/" class="btn btn-red">SIGNALS</a>
     </div>
   </div>
 </section>
@@ -288,11 +288,6 @@ def build_home():
   <div class="signals-grid">{''.join(signal_card(x) for x in activity) or empty('準備中')}</div>
 </section>
 
-<section class="section connect-band">
-  {section_head("COLLABORATION", "// 05 CONNECT")}
-  <p class="statement">{e(SITE['collab_intro'])}</p>
-  <p><a class="btn btn-primary" href="/connect/">CONNECT →</a></p>
-</section>
 """
     page("/", "", body, "HOME")
 
@@ -440,7 +435,7 @@ def build_signals():
 
 def build_connect():
     notes = "".join(f"<li>{e(n)}</li>" for n in SITE["connect_notes"])
-    body = f"""{header("CONTACT CHANNEL / CONNECT", "CONNECT", SITE['collab_intro'], "// 06")}
+    body = f"""{header("FOR ARTISTS / CONTACT CHANNEL", "FOR ARTISTS", SITE['collab_intro'], "// PARTICIPATION")}
 <section class="section connect">
   <form class="form" name="connect" method="POST" action="/connect/thanks/" data-netlify="true" netlify-honeypot="bot-field">
     <input type="hidden" name="form-name" value="connect">
@@ -469,9 +464,9 @@ def build_connect():
     <ul>{notes}</ul>
   </aside>
 </section>"""
-    page("/connect/", "CONNECT", body, "CONNECT")
+    page("/connect/", "FOR ARTISTS", body, noindex=True)
     page("/connect/thanks/", "送信完了", f"""{header("SIGNAL RECEIVED", "THANK YOU", "送信を受け付けました。内容を確認のうえ、ご連絡します。", "// 06")}
-<section class="section"><a class="btn btn-ghost" href="/">← HOME</a></section>""", "CONNECT")
+<section class="section"><a class="btn btn-ghost" href="/">← HOME</a></section>""", noindex=True)
 
 
 def build_404():
